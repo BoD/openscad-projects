@@ -19,8 +19,8 @@ module wall_horizontal(
   length,
   height,
 ) {
-  hole_diameter = 10;
-  distance_between_holes = 2;
+  hole_diameter = 12;
+  distance_between_holes = 1.2;
   difference() {
     cube([length, thickness, height]);
     hole_count_x = length / (hole_diameter + distance_between_holes);
@@ -34,13 +34,13 @@ module wall_horizontal(
         shift_x = is_even ? 0 : (hole_diameter + distance_between_holes) / 2;
         translate(
             [
-                    x * (hole_diameter + distance_between_holes) + hole_diameter / 2 + remainder_x / 2 + shift_x,
-                thickness / 2 + hole_diameter / 2,
-                  z * (hole_diameter + distance_between_holes) + hole_diameter / 2 + remainder_z / 2,
+                      x * (hole_diameter + distance_between_holes) + hole_diameter / 2 + remainder_x / 2 + distance_between_holes / 2 + shift_x,
+                thickness * 2 - thickness / 2,
+                    z * (hole_diameter + distance_between_holes) + hole_diameter / 2 + remainder_z / 2 + distance_between_holes / 2,
             ]
         )
-          rotate([90, 0, 0])
-            cylinder(d = hole_diameter, h = thickness * 2);
+          rotate([90, 90, 0])
+            cylinder(d = hole_diameter, h = thickness * 2, $fn = 6);
       }
     }
   };
@@ -66,25 +66,38 @@ module left_part(
   wall_thickness,
   wall_height,
 ) {
-  // Horizontal wall
-  horizontal_wall_length = 187;
-  translate([0, -stand_length / 2 + wall_thickness / 2, 0])
-    stand_vertical(
-      thickness = stand_thickness,
-      length = stand_length,
-      height = wall_height,
-    );
-  wall_horizontal(
-    thickness = wall_thickness,
-    length = horizontal_wall_length,
-    height = wall_height,
-  );
-  translate([horizontal_wall_length - stand_thickness, -stand_length / 2 + wall_thickness / 2, 0])
-    stand_vertical(
-      thickness = stand_thickness,
-      length = stand_length,
-      height = wall_height,
-    );
+  difference() {
+    horizontal_wall_length = 187;
+    union() {
+      // Horizontal wall
+      translate([0, -stand_length / 2 + wall_thickness / 2, 0])
+        stand_vertical(
+          thickness = stand_thickness,
+          length = stand_length,
+          height = wall_height,
+        );
+      wall_horizontal(
+        thickness = wall_thickness,
+        length = horizontal_wall_length,
+        height = wall_height,
+      );
+      translate([horizontal_wall_length - stand_thickness, -stand_length / 2 + wall_thickness / 2, 0])
+        stand_vertical(
+          thickness = stand_thickness,
+          length = stand_length,
+          height = wall_height,
+        );
+    };
+
+    // Indent
+    indent_width = 10;
+    translate([horizontal_wall_length - indent_width, -stand_length / 2 + wall_thickness / 2, 0])
+      cube([
+        indent_width,
+        stand_length,
+        6,
+        ]);
+  };
 
   // Vertical wall
   vertical_wall_length = 260;
