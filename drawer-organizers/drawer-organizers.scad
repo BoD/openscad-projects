@@ -66,10 +66,10 @@ module left_part(
   wall_thickness,
   wall_height,
 ) {
+  // Horizontal wall
   difference() {
     horizontal_wall_length = 187;
     union() {
-      // Horizontal wall
       translate([0, -stand_length / 2 + wall_thickness / 2, 0])
         stand_vertical(
           thickness = stand_thickness,
@@ -117,6 +117,83 @@ module left_part(
 
 }
 
+module right_part(
+  stand_thickness,
+  stand_length,
+  wall_thickness,
+  wall_height,
+) {
+  vertical_wall_offset = 27;
+  horizontal_wall_1_length = 187;
+
+  // Horizontal wall 1
+  difference() {
+    union() {
+      translate([0, -stand_length / 2 + wall_thickness / 2, 0])
+        stand_vertical(
+          thickness = stand_thickness,
+          length = stand_length,
+          height = wall_height,
+        );
+      wall_horizontal(
+        thickness = wall_thickness,
+        length = horizontal_wall_1_length,
+        height = wall_height,
+      );
+      translate([horizontal_wall_1_length - stand_thickness, -stand_length / 2 + wall_thickness / 2, 0])
+        stand_vertical(
+          thickness = stand_thickness,
+          length = stand_length,
+          height = wall_height,
+        );
+    };
+
+    // Indent
+    indent_width = 10;
+    translate([0, -stand_length / 2 + wall_thickness / 2, 0])
+      cube([
+        indent_width,
+        stand_length,
+        6,
+        ]);
+  };
+
+  // Horizontal wall 2
+  horizontal_wall_2_offset = 90;
+  horizontal_wall_2_length = horizontal_wall_1_length - vertical_wall_offset;
+  translate([vertical_wall_offset, -horizontal_wall_2_offset, 0]) {
+    wall_horizontal(
+      thickness = wall_thickness,
+      length = horizontal_wall_2_length,
+      height = wall_height,
+    );
+
+    translate([horizontal_wall_2_length - stand_thickness, -stand_length / 2 + wall_thickness / 2, 0])
+      stand_vertical(
+        thickness = stand_thickness,
+        length = stand_length,
+        height = wall_height,
+      );
+  }
+
+
+  // Vertical wall
+  vertical_wall_length = 260;
+  translate([vertical_wall_offset, -vertical_wall_length + wall_thickness, 0])
+    wall_vertical(
+      thickness = wall_thickness,
+      length = vertical_wall_length,
+      height = wall_height,
+    );
+  translate([vertical_wall_offset - stand_length / 2 + wall_thickness / 2, -vertical_wall_length + wall_thickness, 0])
+    stand_horizontal(
+      thickness = stand_thickness,
+      length = stand_length,
+      height = wall_height,
+    );
+
+}
+
 
 module main() {
   stand_thickness = 2;
@@ -125,7 +202,7 @@ module main() {
   wall_thickness = 4;
   wall_height = 70;
 
-  left_part(
+  right_part(
     stand_thickness = stand_thickness,
     stand_length = stand_length,
     wall_thickness = wall_thickness,
