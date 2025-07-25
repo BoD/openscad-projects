@@ -1,6 +1,12 @@
-module logo(thickness) {
-  linear_extrude(height = thickness)
-    import("lurez-logo.svg", center = false);
+module lurez_logo(
+  width,
+  thickness
+) {
+  height = width * 3 / 4;
+  translate([-width / 2, -height / 2, 0])
+    linear_extrude(height = thickness)
+      resize([width, height, 0], true)
+        import("lurez-logo.svg", center = false);
 }
 
 
