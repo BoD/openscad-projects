@@ -1,14 +1,14 @@
 use <flexible_cylinder.scad>
 
 module support_base(
-token_diameter,
-padding_around_token,
-thickness,
-color_indent,
-peg_hole_diameter,
-peg_thickness_ratio,
-magnet_width,
-magnet_height,
+  token_diameter,
+  padding_around_token,
+  thickness,
+  color_indent,
+  peg_hole_diameter,
+  peg_thickness_ratio,
+  magnet_width,
+  magnet_height,
 ) {
   color("white")
     difference() {
@@ -58,9 +58,9 @@ magnet_height,
 }
 
 module color_indicator(
-token_diameter,
-thickness,
-color,
+  token_diameter,
+  thickness,
+  color,
 ) {
   color(color)
     translate([token_diameter / 2, token_diameter / 2, 0])
@@ -68,13 +68,13 @@ color,
 }
 
 module support_top(
-token_diameter,
-padding_around_token,
-token_thickness,
-thickness,
-peg_diameter,
-peg_thickness_ratio,
-base_thickness,
+  token_diameter,
+  padding_around_token,
+  token_thickness,
+  thickness,
+  peg_diameter,
+  peg_thickness_ratio,
+  base_thickness,
 ) {
   color("white") {
     peg_height = base_thickness * peg_thickness_ratio;
@@ -124,12 +124,12 @@ base_thickness,
 }
 
 module token(
-diameter,
-thickness,
-magnet_width,
-magnet_height,
-grab_diameter,
-grab_indent,
+  diameter,
+  thickness,
+  magnet_width,
+  magnet_height,
+  grab_diameter,
+  grab_indent,
 ) {
   color("white")
     translate([diameter / 2, diameter / 2, 0])
@@ -148,46 +148,46 @@ grab_indent,
 }
 
 module everything_assembled(
-magnet_width,
-magnet_height,
-token_diameter,
-token_grab_diameter,
-token_grab_indent,
-token_thickness,
-padding_around_token,
-support_base_thickness,
-support_top_thickness,
-color_indent,
-peg_diameter,
-peg_hole_diameter,
-peg_thickness_ratio,
+  magnet_width,
+  magnet_height,
+  token_diameter,
+  token_grab_diameter,
+  token_grab_indent,
+  token_thickness,
+  padding_around_token,
+  support_base_thickness,
+  support_top_thickness,
+  color_indent,
+  peg_diameter,
+  peg_hole_diameter,
+  peg_thickness_ratio,
 ) {
   // Support base
   support_base(
-  token_diameter = token_diameter,
-  padding_around_token = padding_around_token,
-  thickness = support_base_thickness,
-  color_indent = color_indent,
-  peg_hole_diameter = peg_hole_diameter,
-  peg_thickness_ratio = peg_thickness_ratio,
-  magnet_width = magnet_width,
-  magnet_height = magnet_height
+    token_diameter = token_diameter,
+    padding_around_token = padding_around_token,
+    thickness = support_base_thickness,
+    color_indent = color_indent,
+    peg_hole_diameter = peg_hole_diameter,
+    peg_thickness_ratio = peg_thickness_ratio,
+    magnet_width = magnet_width,
+    magnet_height = magnet_height
   );
 
   // Red color indicator
   translate([padding_around_token, padding_around_token, support_base_thickness - color_indent])
     color_indicator(
-    token_diameter = token_diameter,
-    thickness = color_indent,
-    color = "red"
+      token_diameter = token_diameter,
+      thickness = color_indent,
+      color = "red"
     );
 
   // Green color indicator
   translate([token_diameter + padding_around_token * 2, padding_around_token, support_base_thickness - color_indent])
     color_indicator(
-    token_diameter = token_diameter,
-    thickness = color_indent,
-    color = "green"
+      token_diameter = token_diameter,
+      thickness = color_indent,
+      color = "green"
     );
 
   peg_height = support_base_thickness * peg_thickness_ratio;
@@ -195,68 +195,68 @@ peg_thickness_ratio,
   // Support top
   translate([0, 0, support_base_thickness - peg_height])
     support_top(
-    token_diameter = token_diameter,
-    padding_around_token = padding_around_token,
-    token_thickness = token_thickness,
-    thickness = support_top_thickness,
-    peg_diameter = peg_diameter,
-    peg_thickness_ratio = peg_thickness_ratio,
-    base_thickness = support_base_thickness
+      token_diameter = token_diameter,
+      padding_around_token = padding_around_token,
+      token_thickness = token_thickness,
+      thickness = support_top_thickness,
+      peg_diameter = peg_diameter,
+      peg_thickness_ratio = peg_thickness_ratio,
+      base_thickness = support_base_thickness
     );
 
   // Token
   translate([padding_around_token + $t * token_diameter, padding_around_token, support_base_thickness])
     token(
-    diameter = token_diameter,
-    thickness = token_thickness,
-    magnet_width = magnet_width,
-    magnet_height = magnet_height,
-    grab_diameter = token_grab_diameter,
-    grab_indent = token_grab_indent
+      diameter = token_diameter,
+      thickness = token_thickness,
+      magnet_width = magnet_width,
+      magnet_height = magnet_height,
+      grab_diameter = token_grab_diameter,
+      grab_indent = token_grab_indent
     );
 }
 
 module everything_exploded(
-magnet_width,
-magnet_height,
-token_diameter,
-token_grab_diameter,
-token_grab_indent,
-token_thickness,
-padding_around_token,
-support_base_thickness,
-support_top_thickness,
-color_indent,
-peg_diameter,
-peg_hole_diameter,
-peg_thickness_ratio,
+  magnet_width,
+  magnet_height,
+  token_diameter,
+  token_grab_diameter,
+  token_grab_indent,
+  token_thickness,
+  padding_around_token,
+  support_base_thickness,
+  support_top_thickness,
+  color_indent,
+  peg_diameter,
+  peg_hole_diameter,
+  peg_thickness_ratio,
 ) {
   // Support base
   support_base(
-  token_diameter = token_diameter,
-  padding_around_token = padding_around_token,
-  thickness = support_base_thickness,
-  color_indent = color_indent,
-  peg_hole_diameter = peg_hole_diameter,
-  peg_thickness_ratio = peg_thickness_ratio,
-  magnet_width = magnet_width,
-  magnet_height = magnet_height
+    token_diameter = token_diameter,
+    padding_around_token = padding_around_token,
+    thickness = support_base_thickness,
+    color_indent = color_indent,
+    peg_hole_diameter = peg_hole_diameter,
+    peg_thickness_ratio = peg_thickness_ratio,
+    magnet_width = magnet_width,
+    magnet_height = magnet_height
   );
 
   // Red color indicator
   translate([50, 0, 0])
     color_indicator(
-    token_diameter = token_diameter,
-    thickness = color_indent,
-    color = "red"
+      token_diameter = token_diameter,
+      thickness = color_indent,
+      color = "red"
     );
 
   // Green color indicator
   translate([75, 0, 0])
     color_indicator(
-    token_diameter = token_diameter,
-    thickness = color_indent,
-    color = "green"
+      token_diameter = token_diameter,
+      thickness = color_indent,
+      color = "green"
     );
 
   peg_height = support_base_thickness * peg_thickness_ratio;
@@ -264,24 +264,24 @@ peg_thickness_ratio,
   // Support top
   translate([0, 30, 0])
     support_top(
-    token_diameter = token_diameter,
-    padding_around_token = padding_around_token,
-    token_thickness = token_thickness,
-    thickness = support_top_thickness,
-    peg_diameter = peg_diameter,
-    peg_thickness_ratio = peg_thickness_ratio,
-    base_thickness = support_base_thickness
+      token_diameter = token_diameter,
+      padding_around_token = padding_around_token,
+      token_thickness = token_thickness,
+      thickness = support_top_thickness,
+      peg_diameter = peg_diameter,
+      peg_thickness_ratio = peg_thickness_ratio,
+      base_thickness = support_base_thickness
     );
 
   // Token
   translate([100, 0, 0])
     token(
-    diameter = token_diameter,
-    thickness = token_thickness,
-    magnet_width = magnet_width,
-    magnet_height = magnet_height,
-    grab_diameter = token_grab_diameter,
-    grab_indent = token_grab_indent
+      diameter = token_diameter,
+      thickness = token_thickness,
+      magnet_width = magnet_width,
+      magnet_height = magnet_height,
+      grab_diameter = token_grab_diameter,
+      grab_indent = token_grab_indent
     );
 }
 
@@ -322,19 +322,19 @@ module main() {
   //  );
 
   everything_exploded(
-  magnet_width = magnet_width,
-  magnet_height = magnet_height,
-  token_diameter = token_diameter,
-  token_grab_diameter = token_grab_diameter,
-  token_grab_indent = token_grab_indent,
-  token_thickness = token_thickness,
-  padding_around_token = padding_around_token,
-  support_base_thickness = support_base_thickness,
-  support_top_thickness = support_top_thickness,
-  color_indent = color_indent,
-  peg_diameter = peg_diameter,
-  peg_hole_diameter = peg_hole_diameter,
-  peg_thickness_ratio = peg_thickness_ratio
+    magnet_width = magnet_width,
+    magnet_height = magnet_height,
+    token_diameter = token_diameter,
+    token_grab_diameter = token_grab_diameter,
+    token_grab_indent = token_grab_indent,
+    token_thickness = token_thickness,
+    padding_around_token = padding_around_token,
+    support_base_thickness = support_base_thickness,
+    support_top_thickness = support_top_thickness,
+    color_indent = color_indent,
+    peg_diameter = peg_diameter,
+    peg_hole_diameter = peg_hole_diameter,
+    peg_thickness_ratio = peg_thickness_ratio
   );
 
 }
