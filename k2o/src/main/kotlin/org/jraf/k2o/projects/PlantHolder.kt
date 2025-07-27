@@ -23,26 +23,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("FunctionName")
-
 package org.jraf.k2o.projects
 
+import androidx.compose.runtime.Composable
 import kotlinx.io.asSink
 import kotlinx.io.buffered
-import org.jraf.k2o.dsl.OpenScad
-import org.jraf.k2o.dsl.writeOpenScad
-import org.jraf.k2o.stdlib.cylinder
+import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.stdlib.Cylinder
+import org.jraf.k2o.stdlib.Polygon
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.linearExtrude
 import org.jraf.k2o.stdlib.mirror
-import org.jraf.k2o.stdlib.polygon
 import org.jraf.k2o.stdlib.translate
 
-private fun OpenScad.Half(
+@Composable
+private fun Half(
   width: Int,
   height: Int,
 ) {
-  polygon(
+  Polygon(
     width / 2 to (height - 10),
     0 to height,
     0 to 10,
@@ -50,7 +49,8 @@ private fun OpenScad.Half(
   )
 }
 
-private fun OpenScad.PlantHolder() {
+@Composable
+private fun PlantHolder() {
   val width = 20
   val height = 60
   val thickness = 2
@@ -70,17 +70,17 @@ private fun OpenScad.PlantHolder() {
     }
 
     translate(0, 21, 0) {
-      cylinder(diameter = 15, height = thickness)
+      Cylinder(diameter = 15, height = thickness)
     }
 
     translate(0, 40, 0) {
-      cylinder(diameter = 15, height = thickness)
+      Cylinder(diameter = 15, height = thickness)
     }
   }
 }
 
 fun main() {
-  writeOpenScad(System.out.asSink().buffered()) {
+  openScad(System.out.asSink().buffered()) {
     PlantHolder()
   }
 }

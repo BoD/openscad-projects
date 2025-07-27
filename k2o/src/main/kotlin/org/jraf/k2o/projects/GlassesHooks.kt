@@ -23,39 +23,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("FunctionName")
-
 package org.jraf.k2o.projects
 
+import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import org.jraf.k2o.dsl.OpenScad
-import org.jraf.k2o.dsl.writeOpenScad
+import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.math.cos
-import org.jraf.k2o.stdlib.cube
-import org.jraf.k2o.stdlib.cylinder
+import org.jraf.k2o.stdlib.Cube
+import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.hull
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
 
-private fun OpenScad.Base(
+@Composable
+private fun Base(
   width: Int,
   height: Int,
   thickness: Int,
 ) {
   hull {
     translate(height / 2, height / 2, 0) {
-      cylinder(height = thickness, radius = height / 2)
+      Cylinder(height = thickness, radius = height / 2)
     }
     translate(width - height / 2, height / 2, 0) {
-      cylinder(height = thickness, radius = height / 2)
+      Cylinder(height = thickness, radius = height / 2)
     }
   }
 }
 
-private fun OpenScad.Hook(
+@Composable
+private fun Hook(
   radius: Int,
   height: Int,
   angle: Int,
@@ -65,17 +65,18 @@ private fun OpenScad.Hook(
     translate(0, -2 * radius * cos(angle), 0) {
       rotate(-90 + angle, 0, 0) {
         translate(0, radius, 0) {
-          cylinder(height = height, radius = radius)
+          Cylinder(height = height, radius = radius)
         }
       }
     }
     translate(-radius, -height / 2, -radius * 2) {
-      cube(radius * 2, height, radius * 2)
+      Cube(radius * 2, height, radius * 2)
     }
   }
 }
 
-private fun OpenScad.GlassesHooks() {
+@Composable
+private fun GlassesHooks() {
   val baseWidth = 30
   val baseHeight = 24
   val baseThickness = 1
@@ -108,7 +109,7 @@ private fun OpenScad.GlassesHooks() {
 }
 
 fun main() {
-  writeOpenScad(SystemFileSystem.sink(Path("/Users/bod/Tmp/tmp.scad")).buffered()) {
+  openScad(SystemFileSystem.sink(Path("/Users/bod/Tmp/tmp.scad")).buffered()) {
     GlassesHooks()
   }
 }

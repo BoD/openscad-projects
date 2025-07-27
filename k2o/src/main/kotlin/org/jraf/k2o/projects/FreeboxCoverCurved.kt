@@ -23,30 +23,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("FunctionName")
-
 package org.jraf.k2o.projects
 
+import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import org.jraf.k2o.dsl.OpenScad
-import org.jraf.k2o.dsl.writeOpenScad
+import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.math.atan
 import org.jraf.k2o.math.cos
 import org.jraf.k2o.math.sin
-import org.jraf.k2o.stdlib.call
+import org.jraf.k2o.stdlib.Call
+import org.jraf.k2o.stdlib.Import
+import org.jraf.k2o.stdlib.Sphere
+import org.jraf.k2o.stdlib.Use
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.hull
-import org.jraf.k2o.stdlib.import
 import org.jraf.k2o.stdlib.resize
 import org.jraf.k2o.stdlib.rotate
-import org.jraf.k2o.stdlib.sphere
 import org.jraf.k2o.stdlib.translate
-import org.jraf.k2o.stdlib.use
 import kotlin.math.sqrt
 
-private fun OpenScad.FrontPlateLine(
+@Composable
+private fun FrontPlateLine(
   thickness: Int,
   frontHeight: Int,
   frontBottomWidth: Int,
@@ -74,17 +73,18 @@ private fun OpenScad.FrontPlateLine(
   }
 
   translate(curveRadius * sin(angleBottom), curveRadius * cos(angleBottom), z + thickness / 2) {
-    sphere(thickness / 2)
+    Sphere(thickness / 2)
   }
 
   // Top
   val angleTop = (curveAngle * frontTopBottomRatio / step) * i - curveAngle * frontTopBottomRatio / 2
   translate(curveRadius * sin(angleTop), curveRadius * cos(angleTop), frontHeight - thickness / 2) {
-    sphere(thickness / 2)
+    Sphere(thickness / 2)
   }
 }
 
-private fun OpenScad.FrontPlate(
+@Composable
+private fun FrontPlate(
   thickness: Int,
   frontHeight: Int,
   frontBottomWidth: Int,
@@ -132,19 +132,21 @@ private fun OpenScad.FrontPlate(
   }
 }
 
-private fun OpenScad.Logo(height: Int, thickness: Int, curveRadius: Int) {
+@Composable
+private fun Logo(height: Int, thickness: Int, curveRadius: Int) {
   translate(0, curveRadius + thickness, height / 2) {
     rotate(0, 0, -90) {
-      call("cylinder_extrude", "r_cyl" to curveRadius, "r_delta" to thickness * 2, "h" to height) {
+      Call("cylinder_extrude", "r_cyl" to curveRadius, "r_delta" to thickness * 2, "h" to height) {
         resize(0, height.toDouble(), 0, auto = true) {
-          import("lurez-full.svg", center = true)
+          Import("lurez-full.svg", center = true)
         }
       }
     }
   }
 }
 
-private fun OpenScad.Front(
+@Composable
+private fun Front(
   thickness: Int,
   frontHeight: Int,
   frontBottomWidth: Int,
@@ -175,7 +177,8 @@ private fun OpenScad.Front(
   }
 }
 
-private fun OpenScad.Top(
+@Composable
+private fun Top(
   thickness: Int,
   frontHeight: Int,
   frontBottomWidth: Int,
@@ -194,24 +197,25 @@ private fun OpenScad.Top(
         for (i in 0..step) {
           val angleTop = (curveAngle * frontTopBottomRatio / step) * i - curveAngle * frontTopBottomRatio / 2
           translate(curveRadius * sin(angleTop), curveRadius * cos(angleTop), frontHeight - thickness / 2) {
-            sphere(thickness / 2)
+            Sphere(thickness / 2)
           }
         }
       }
     }
 
     translate(-topBackWidth / 2, topDepth, frontHeight - thickness / 2) {
-      sphere(thickness / 2)
+      Sphere(thickness / 2)
     }
 
     translate(topBackWidth / 2, topDepth, frontHeight - thickness / 2) {
-      sphere(thickness / 2)
+      Sphere(thickness / 2)
     }
   }
 }
 
-private fun OpenScad.FreeboxCover() {
-  use("cylinder_extrude.scad")
+@Composable
+private fun FreeboxCover() {
+  Use("cylinder_extrude.scad")
 
   val fbxHeight = 67
 
@@ -263,7 +267,7 @@ private fun OpenScad.FreeboxCover() {
 
 
 fun main() {
-  writeOpenScad(SystemFileSystem.sink(Path("/Users/bod/gitrepo/openscad-projects/freebox-cover/tmp.scad")).buffered()) {
+  openScad(SystemFileSystem.sink(Path("/Users/bod/gitrepo/openscad-projects/freebox-cover/tmp.scad")).buffered()) {
     FreeboxCover()
   }
 }

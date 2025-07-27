@@ -23,24 +23,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("FunctionName")
-
 package org.jraf.k2o.projects
 
+import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import org.jraf.k2o.dsl.OpenScad
-import org.jraf.k2o.dsl.writeOpenScad
-import org.jraf.k2o.stdlib.call
+import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.stdlib.Call
+import org.jraf.k2o.stdlib.Cylinder
+import org.jraf.k2o.stdlib.Use
 import org.jraf.k2o.stdlib.color
-import org.jraf.k2o.stdlib.cylinder
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.hull
 import org.jraf.k2o.stdlib.translate
-import org.jraf.k2o.stdlib.use
 
-private fun OpenScad.SupportBase(
+@Composable
+private fun SupportBase(
   tokenDiameter: Double,
   paddingAroundToken: Double,
   thickness: Double,
@@ -55,27 +54,27 @@ private fun OpenScad.SupportBase(
       translate((tokenDiameter + paddingAroundToken * 2) / 2, (tokenDiameter + paddingAroundToken * 2) / 2, 0) {
         difference {
           hull {
-            cylinder(diameter = tokenDiameter + paddingAroundToken * 2, height = thickness)
+            Cylinder(diameter = tokenDiameter + paddingAroundToken * 2, height = thickness)
             translate(tokenDiameter + paddingAroundToken, 0, 0) {
-              cylinder(diameter = tokenDiameter + paddingAroundToken * 2, height = thickness)
+              Cylinder(diameter = tokenDiameter + paddingAroundToken * 2, height = thickness)
             }
           }
 
           // Left indent
           translate(0, 0, thickness - colorIndent) {
-            cylinder(diameter = tokenDiameter, height = thickness)
+            Cylinder(diameter = tokenDiameter, height = thickness)
           }
 
           // Right indent
           translate(tokenDiameter + paddingAroundToken, 0, thickness - colorIndent) {
-            cylinder(diameter = tokenDiameter, height = thickness)
+            Cylinder(diameter = tokenDiameter, height = thickness)
           }
 
           val magnetHeightAdjusted = magnetHeight * 1.1 // Make the magnet holes slightly taller than the magnets
           // Left magnet hole
           translate(0, 0, thickness - colorIndent - magnetHeightAdjusted) {
-            call(
-              "flexible_cylinder",
+            Call(
+              "flexible_Cylinder",
               "d" to magnetWidth,
               "h" to magnetHeightAdjusted,
               "flex" to 2,
@@ -84,8 +83,8 @@ private fun OpenScad.SupportBase(
 
           // Right magnet hole
           translate(tokenDiameter + paddingAroundToken, 0, thickness - colorIndent - magnetHeightAdjusted) {
-            call(
-              "flexible_cylinder",
+            Call(
+              "flexible_Cylinder",
               "d" to magnetWidth,
               "h" to magnetHeightAdjusted,
               "flex" to 2,
@@ -97,7 +96,7 @@ private fun OpenScad.SupportBase(
       val pegHeight = thickness * pegThicknessRatio * 1.1 // Make the peg holes slightly taller than the pegs
       // Left peg hole
       translate(paddingAroundToken / 2, (tokenDiameter + paddingAroundToken * 2) / 2, thickness - pegHeight) {
-        cylinder(diameter = pegHoleDiameter, height = pegHeight)
+        Cylinder(diameter = pegHoleDiameter, height = pegHeight)
       }
 
       // Right peg hole
@@ -106,7 +105,7 @@ private fun OpenScad.SupportBase(
         (tokenDiameter + paddingAroundToken * 2) / 2,
         thickness - pegHeight,
       ) {
-        cylinder(diameter = pegHoleDiameter, height = pegHeight)
+        Cylinder(diameter = pegHoleDiameter, height = pegHeight)
       }
 
       // Bottom peg hole
@@ -115,7 +114,7 @@ private fun OpenScad.SupportBase(
         paddingAroundToken / 2,
         thickness - pegHeight,
       ) {
-        cylinder(diameter = pegHoleDiameter, height = pegHeight)
+        Cylinder(diameter = pegHoleDiameter, height = pegHeight)
       }
 
       // Top peg hole
@@ -124,25 +123,27 @@ private fun OpenScad.SupportBase(
         tokenDiameter + paddingAroundToken * 2 - paddingAroundToken / 2,
         thickness - pegHeight,
       ) {
-        cylinder(diameter = pegHoleDiameter, height = pegHeight)
+        Cylinder(diameter = pegHoleDiameter, height = pegHeight)
       }
     }
   }
 }
 
-private fun OpenScad.ColorIndicator(
+@Composable
+private fun ColorIndicator(
   tokenDiameter: Double,
   thickness: Double,
   color: String,
 ) {
   color(color) {
     translate(tokenDiameter / 2, tokenDiameter / 2, 0) {
-      cylinder(diameter = tokenDiameter, height = thickness)
+      Cylinder(diameter = tokenDiameter, height = thickness)
     }
   }
 }
 
-private fun OpenScad.SupportTop(
+@Composable
+private fun SupportTop(
   tokenDiameter: Double,
   paddingAroundToken: Double,
   tokenThickness: Double,
@@ -159,27 +160,27 @@ private fun OpenScad.SupportTop(
       difference {
         // Outer
         hull {
-          cylinder(diameter = tokenDiameter + paddingAroundToken * 2, height = tokenThickness + thickness + wiggleRoom)
+          Cylinder(diameter = tokenDiameter + paddingAroundToken * 2, height = tokenThickness + thickness + wiggleRoom)
           translate(tokenDiameter + paddingAroundToken, 0, 0) {
-            cylinder(diameter = tokenDiameter + paddingAroundToken * 2, height = tokenThickness + thickness + wiggleRoom)
+            Cylinder(diameter = tokenDiameter + paddingAroundToken * 2, height = tokenThickness + thickness + wiggleRoom)
           }
         }
 
         // Inner
         hull {
-          cylinder(diameter = tokenDiameter, height = tokenThickness + wiggleRoom)
+          Cylinder(diameter = tokenDiameter, height = tokenThickness + wiggleRoom)
           translate(tokenDiameter + paddingAroundToken, 0, 0) {
-            cylinder(diameter = tokenDiameter, height = tokenThickness + wiggleRoom)
+            Cylinder(diameter = tokenDiameter, height = tokenThickness + wiggleRoom)
           }
         }
 
         // Top opening
         hull {
           translate(0, 0, tokenThickness) {
-            cylinder(diameter = tokenDiameter - paddingAroundToken * 2, height = thickness + wiggleRoom)
+            Cylinder(diameter = tokenDiameter - paddingAroundToken * 2, height = thickness + wiggleRoom)
           }
           translate(tokenDiameter + paddingAroundToken, 0, tokenThickness) {
-            cylinder(diameter = tokenDiameter - paddingAroundToken * 2, height = thickness + wiggleRoom)
+            Cylinder(diameter = tokenDiameter - paddingAroundToken * 2, height = thickness + wiggleRoom)
           }
         }
       }
@@ -187,7 +188,7 @@ private fun OpenScad.SupportTop(
 
     // Left peg hole
     translate(paddingAroundToken / 2, (tokenDiameter + paddingAroundToken * 2) / 2, 0) {
-      cylinder(diameter = pegDiameter, height = pegHeight)
+      Cylinder(diameter = pegDiameter, height = pegHeight)
     }
 
     // Right peg hole
@@ -196,7 +197,7 @@ private fun OpenScad.SupportTop(
       (tokenDiameter + paddingAroundToken * 2) / 2,
       0,
     ) {
-      cylinder(diameter = pegDiameter, height = pegHeight)
+      Cylinder(diameter = pegDiameter, height = pegHeight)
     }
 
     // Bottom peg hole
@@ -205,7 +206,7 @@ private fun OpenScad.SupportTop(
       paddingAroundToken / 2,
       0,
     ) {
-      cylinder(diameter = pegDiameter, height = pegHeight)
+      Cylinder(diameter = pegDiameter, height = pegHeight)
     }
 
     // Top peg hole
@@ -214,12 +215,13 @@ private fun OpenScad.SupportTop(
       tokenDiameter + paddingAroundToken * 2 - paddingAroundToken / 2,
       0,
     ) {
-      cylinder(diameter = pegDiameter, height = pegHeight)
+      Cylinder(diameter = pegDiameter, height = pegHeight)
     }
   }
 }
 
-private fun OpenScad.Token(
+@Composable
+private fun Token(
   diameter: Double,
   thickness: Double,
   magnetWidth: Double,
@@ -230,12 +232,12 @@ private fun OpenScad.Token(
   color("white") {
     translate(diameter / 2, diameter / 2, 0) {
       difference {
-        cylinder(diameter = diameter, height = thickness)
+        Cylinder(diameter = diameter, height = thickness)
 
         val magnetHeightAdjusted = magnetHeight * 1.1 // Make the magnet hole slightly taller than the magnet
         // Magnet hole
-        call(
-          "flexible_cylinder",
+        Call(
+          "flexible_Cylinder",
           "d" to magnetWidth,
           "h" to magnetHeightAdjusted,
           "flex" to 2,
@@ -243,14 +245,15 @@ private fun OpenScad.Token(
 
         // Grab indent
         translate(0, 0, thickness - grabIndent) {
-          cylinder(diameter = grabDiameter, height = grabIndent)
+          Cylinder(diameter = grabDiameter, height = grabIndent)
         }
       }
     }
   }
 }
 
-private fun OpenScad.EverythingAssembled(
+@Composable
+private fun EverythingAssembled(
   magnetWidth: Double,
   magnetHeight: Double,
   tokenDiameter: Double,
@@ -323,7 +326,8 @@ private fun OpenScad.EverythingAssembled(
   }
 }
 
-private fun OpenScad.EverythingExploded(
+@Composable
+private fun EverythingExploded(
   magnetWidth: Double,
   magnetHeight: Double,
   tokenDiameter: Double,
@@ -396,8 +400,9 @@ private fun OpenScad.EverythingExploded(
   }
 }
 
-fun OpenScad.RedGreenSwitch() {
-  use("flexible_cylinder.scad")
+@Composable
+private fun RedGreenSwitch() {
+  Use("flexible_Cylinder.scad")
   val magnetWidth = 9.9
   val magnetHeight = 6.0
   val paddingAroundToken = 3.2
@@ -429,7 +434,7 @@ fun OpenScad.RedGreenSwitch() {
 }
 
 fun main() {
-  writeOpenScad(SystemFileSystem.sink(Path("/Users/bod/gitrepo/openscad-projects/red-green-switch/tmp.scad")).buffered()) {
+  openScad(SystemFileSystem.sink(Path("/Users/bod/gitrepo/openscad-projects/red-green-switch/tmp.scad")).buffered()) {
     RedGreenSwitch()
   }
 }

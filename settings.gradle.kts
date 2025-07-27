@@ -1,4 +1,4 @@
-rootProject.name = "k2o-root"
+rootProject.name = "openscad-projects"
 
 pluginManagement {
   repositories {
@@ -11,6 +11,7 @@ dependencyResolutionManagement {
   @Suppress("UnstableApiUsage")
   repositories {
     mavenCentral()
+    google()
     mavenLocal()
   }
 }

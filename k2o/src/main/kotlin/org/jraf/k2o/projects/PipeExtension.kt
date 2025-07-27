@@ -23,52 +23,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("FunctionName")
-
 package org.jraf.k2o.projects
 
+import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import org.jraf.k2o.dsl.OpenScad
-import org.jraf.k2o.dsl.writeOpenScad
-import org.jraf.k2o.stdlib.cube
-import org.jraf.k2o.stdlib.cylinder
+import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.stdlib.Cube
+import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
 import kotlin.math.sqrt
 
-private fun OpenScad.PipeExtension(
+@Composable
+private fun PipeExtension(
   innerDiameter: Double,
   length: Double,
   thickness: Double,
 ) {
   difference {
     // Outer tube
-    cylinder(height = length, radius = innerDiameter / 2 + thickness)
+    Cylinder(height = length, radius = innerDiameter / 2 + thickness)
 
     // Inner tube
-    cylinder(height = length, radius = innerDiameter / 2)
+    Cylinder(height = length, radius = innerDiameter / 2)
 
     // Slant
     val cubeSide = length
     translate(-cubeSide / sqrt(2.0) + innerDiameter / 2 + thickness, 0, cubeSide / sqrt(2.0) + (length - cubeSide / sqrt(2.0))) {
       rotate(0, 45, 0) {
-        cube(cubeSide, center = true)
+        Cube(cubeSide, center = true)
       }
     }
 
     // Slit
     val slitWidth = thickness * 5
     translate(-innerDiameter, -slitWidth / 2, 0) {
-      cube(innerDiameter, slitWidth, length)
+      Cube(innerDiameter, slitWidth, length)
     }
   }
 }
 
 fun main() {
-  writeOpenScad(SystemFileSystem.sink(Path("/Users/bod/gitrepo/openscad-projects/pipe-extension/tmp.scad")).buffered()) {
+  openScad(SystemFileSystem.sink(Path("/Users/bod/gitrepo/openscad-projects/pipe-extension/tmp.scad")).buffered()) {
     val innerDiameter = 37.0
     val thickness = 2.0
     val length = 200.0

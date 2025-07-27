@@ -23,38 +23,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("FunctionName")
-
 package org.jraf.k2o.projects
 
+import androidx.compose.runtime.Composable
 import kotlinx.io.asSink
 import kotlinx.io.buffered
-import org.jraf.k2o.dsl.OpenScad
-import org.jraf.k2o.dsl.writeOpenScad
-import org.jraf.k2o.stdlib.cube
-import org.jraf.k2o.stdlib.cylinder
+import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.stdlib.Cube
+import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
 import org.jraf.k2o.stdlib.union
 
-private fun OpenScad.StandHorizontal(
+@Composable
+private fun StandHorizontal(
   thickness: Int,
   length: Int,
   height: Int,
 ) {
-  cube(length, thickness, height)
+  Cube(length, thickness, height)
 }
 
-private fun OpenScad.StandVertical(
+@Composable
+private fun StandVertical(
   thickness: Int,
   length: Int,
   height: Int,
 ) {
-  cube(thickness, length, height)
+  Cube(thickness, length, height)
 }
 
-private fun OpenScad.WallHorizontal(
+@Composable
+private fun WallHorizontal(
   thickness: Int,
   length: Int,
   height: Int,
@@ -62,7 +63,7 @@ private fun OpenScad.WallHorizontal(
   val holeDiameter = 12
   val distanceBetweenHoles = 1.2
   difference {
-    cube(length, thickness, height)
+    Cube(length, thickness, height)
     val holeCountX = length / (holeDiameter + distanceBetweenHoles)
     val remainderX = length % (holeDiameter + distanceBetweenHoles)
     val holeCountZ = height / (holeDiameter + distanceBetweenHoles)
@@ -78,7 +79,7 @@ private fun OpenScad.WallHorizontal(
           z * (holeDiameter + distanceBetweenHoles) + holeDiameter / 2 + remainderZ / 2 + distanceBetweenHoles / 2,
         ) {
           rotate(90, 90, 0) {
-            cylinder(diameter = holeDiameter, height = thickness * 2, segments = 6)
+            Cylinder(diameter = holeDiameter, height = thickness * 2, segments = 6)
           }
         }
       }
@@ -86,7 +87,8 @@ private fun OpenScad.WallHorizontal(
   }
 }
 
-private fun OpenScad.WallVertical(
+@Composable
+private fun WallVertical(
   thickness: Int,
   length: Int,
   height: Int,
@@ -102,7 +104,8 @@ private fun OpenScad.WallVertical(
   }
 }
 
-private fun OpenScad.LeftPart(
+@Composable
+private fun LeftPart(
   standThickness: Int,
   standLength: Int,
   wallThickness: Int,
@@ -136,7 +139,7 @@ private fun OpenScad.LeftPart(
     // Indent
     val indentWidth = 10
     translate(horizontalWallLength - indentWidth, -standLength / 2 + wallThickness / 2, 0) {
-      cube(indentWidth, standLength, 6)
+      Cube(indentWidth, standLength, 6)
     }
   }
 
@@ -160,7 +163,8 @@ private fun OpenScad.LeftPart(
 
 }
 
-private fun OpenScad.RightPart(
+@Composable
+private fun RightPart(
   standThickness: Int,
   standLength: Int,
   wallThickness: Int,
@@ -196,7 +200,7 @@ private fun OpenScad.RightPart(
     // Indent
     val indentWidth = 10
     translate(0, -standLength / 2 + wallThickness / 2, 0) {
-      cube(indentWidth, standLength, 6)
+      Cube(indentWidth, standLength, 6)
     }
   }
 
@@ -236,7 +240,8 @@ private fun OpenScad.RightPart(
   }
 }
 
-private fun OpenScad.DrawerOrganizers() {
+@Composable
+private fun DrawerOrganizers() {
   val standThickness = 2
   val standLength = 10
 
@@ -259,7 +264,7 @@ private fun OpenScad.DrawerOrganizers() {
 }
 
 fun main() {
-  writeOpenScad(System.out.asSink().buffered()) {
+  openScad(System.out.asSink().buffered()) {
     DrawerOrganizers()
   }
 }

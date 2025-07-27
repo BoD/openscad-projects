@@ -23,26 +23,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("FunctionName")
-
 package org.jraf.k2o.projects
 
+import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import org.jraf.k2o.dsl.OpenScad
-import org.jraf.k2o.dsl.writeOpenScad
+import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.math.cos
 import org.jraf.k2o.math.sin
-import org.jraf.k2o.stdlib.cylinder
+import org.jraf.k2o.stdlib.Cylinder
+import org.jraf.k2o.stdlib.Import
 import org.jraf.k2o.stdlib.difference
-import org.jraf.k2o.stdlib.import
 import org.jraf.k2o.stdlib.linearExtrude
 import org.jraf.k2o.stdlib.resize
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
 
-private fun OpenScad.Leaf(
+@Composable
+private fun Leaf(
   x: Number,
   y: Number,
   rotate: Number,
@@ -51,24 +50,25 @@ private fun OpenScad.Leaf(
     rotate(0, 0, rotate) {
       linearExtrude(height = 4) {
         resize(0, 18, 0, true) {
-          import("leave.svg", center = true)
+          Import("leave.svg", center = true)
         }
       }
     }
   }
 }
 
-private fun OpenScad.PlantPotSupport(
+@Composable
+private fun PlantPotSupport(
   outerDiameter: Int,
   width: Int,
   thickness: Int,
 ) {
   difference {
     // Outer ring
-    cylinder(height = thickness, radius = outerDiameter / 2)
+    Cylinder(height = thickness, radius = outerDiameter / 2)
 
     // Inner ring
-    cylinder(height = thickness, radius = outerDiameter / 2 - width)
+    Cylinder(height = thickness, radius = outerDiameter / 2 - width)
 
     // Leaves
     val leafCount = 13
@@ -89,7 +89,7 @@ fun main() {
   val outerDiameter = 150
   val thickness = 4
   val width = 30
-  writeOpenScad(SystemFileSystem.sink(Path("/Users/bod/gitrepo/openscad-projects/plant-pot-support/tmp.scad")).buffered()) {
+  openScad(SystemFileSystem.sink(Path("/Users/bod/gitrepo/openscad-projects/plant-pot-support/tmp.scad")).buffered()) {
     PlantPotSupport(
       outerDiameter = outerDiameter,
       width = width,

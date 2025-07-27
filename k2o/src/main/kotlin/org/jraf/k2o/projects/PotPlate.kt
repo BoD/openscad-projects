@@ -23,35 +23,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("FunctionName")
-
 package org.jraf.k2o.projects
 
+import androidx.compose.runtime.Composable
 import kotlinx.io.asSink
 import kotlinx.io.buffered
-import org.jraf.k2o.dsl.OpenScad
-import org.jraf.k2o.dsl.writeOpenScad
-import org.jraf.k2o.stdlib.call
-import org.jraf.k2o.stdlib.circle
+import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.stdlib.Call
+import org.jraf.k2o.stdlib.Circle
+import org.jraf.k2o.stdlib.Square
+import org.jraf.k2o.stdlib.Use
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.rotateExtrude
-import org.jraf.k2o.stdlib.square
 import org.jraf.k2o.stdlib.translate
-import org.jraf.k2o.stdlib.use
 
-private fun OpenScad.crossSection(
+@Composable
+private fun crossSection(
   diameter: Int,
   thickness: Int,
   borderHeight: Int,
   borderAngle: Int,
 ) {
-  square(diameter / 2, thickness)
+  Square(diameter / 2, thickness)
 
   translate(diameter / 2, thickness) {
     rotate(borderAngle) {
       translate(0, -thickness) {
-        square(
+        Square(
           borderHeight,
           thickness,
         );
@@ -61,22 +60,23 @@ private fun OpenScad.crossSection(
 
   translate(diameter / 2, thickness) {
     difference {
-      circle(thickness)
+      Circle(thickness)
       translate(-thickness, 0) {
-        square(thickness * 2)
+        Square(thickness * 2)
       }
     }
   }
 }
 
-private fun OpenScad.PotPlate() {
+@Composable
+private fun PotPlate() {
   val diameter = 180
   val thickness = 4
   val borderHeight = 15
   val borderAngle = 45
   val logoThickness = 1
 
-  use("../lurez-logo/lurez-logo.scad")
+  Use("../lurez-logo/lurez-logo.scad")
 
   difference {
     rotateExtrude {
@@ -89,7 +89,7 @@ private fun OpenScad.PotPlate() {
     }
 
     translate(0, 0, thickness - logoThickness) {
-      call(
+      Call(
         "lurez_logo",
         "width" to 140,
         "thickness" to logoThickness,
@@ -99,7 +99,7 @@ private fun OpenScad.PotPlate() {
 }
 
 fun main() {
-  writeOpenScad(System.out.asSink().buffered()) {
+  openScad(System.out.asSink().buffered()) {
     PotPlate()
   }
 }
