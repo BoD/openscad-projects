@@ -30,6 +30,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.stdlib.Comment
 import org.jraf.k2o.stdlib.Cube
 import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.Sphere
@@ -45,11 +46,12 @@ private fun Main(ballDiameter: Double) {
   val linkDiameter = diameter / 20.0
   val cutSize = (ballDiameter - linkDiameter) / 2
   difference {
-    translate(0, 0, ballDiameter / 2 - cutSize) {
+    translate(z = ballDiameter / 2 - cutSize) {
       GraphQL(ballDiameter)
     }
 
     // Cut it out a bit so it adheres better to the plate
+    Comment("Cut out")
     translate(-20, -20, -ballDiameter) {
       Cube(40, 40, ballDiameter)
     }
@@ -71,20 +73,22 @@ private fun GraphQL(ballDiameter: Double) {
   difference {
     union {
       // Balls
+      Comment("Balls")
       for (i in 0..5) {
-        rotate(0, 0, i * 360.0 / 6 - (360.0 / 6) * 1.5) {
-          translate(radius, 0, 0) {
+        rotate(z = i * 360.0 / 6 - (360.0 / 6) * 1.5) {
+          translate(x = radius) {
             Sphere(diameter = ballDiameter)
           }
         }
       }
 
       // Hexagon
+      Comment("Hexagon")
       val hexagonSideLength = radius
       for (i in 0..5) {
-        rotate(0, 0, i * 360.0 / 6 - (360.0 / 6) * 1.5) {
-          translate(radius, 0, 0) {
-            rotate(90, 0, -30) {
+        rotate(z = i * 360.0 / 6 - (360.0 / 6) * 1.5) {
+          translate(x = radius) {
+            rotate(x = 90, z = -30) {
               Cylinder(height = hexagonSideLength, diameter = linkDiameter)
             }
           }
@@ -92,11 +96,12 @@ private fun GraphQL(ballDiameter: Double) {
       }
 
       // Triangle
+      Comment("Triangle")
       val triangleSideLength = sqrt(3.0) * radius
       for (i in 0..2) {
-        rotate(0, 0, i * 360.0 / 3 - -(360.0 / 6) * 1.5) {
-          translate(radius, 0, 0) {
-            rotate(90, 0, -60) {
+        rotate(z = i * 360.0 / 3 - -(360.0 / 6) * 1.5) {
+          translate(x = radius) {
+            rotate(x = 90, z = -60) {
               Cylinder(height = triangleSideLength, diameter = linkDiameter)
             }
           }
@@ -105,15 +110,13 @@ private fun GraphQL(ballDiameter: Double) {
     }
 
     // Magnet holes (only for top and bottom balls)
+    Comment("Magnet holes")
     union {
       for (i in 0..5) {
         if (i == 0 || i == 3) {
-          rotate(0, 0, i * 360.0 / 6 - (360.0 / 6) * 1.5) {
-            translate(radius, 0, 0) {
-              translate(0, 0, -8 + magnetHeight) {
-                Cylinder(height = 8, diameter = magnetDiameter)
-              }
-
+          rotate(z = i * 360.0 / 6 - (360.0 / 6) * 1.5) {
+            translate(x = radius, z = -8 + magnetHeight) {
+              Cylinder(height = 8, diameter = magnetDiameter)
             }
           }
         }
