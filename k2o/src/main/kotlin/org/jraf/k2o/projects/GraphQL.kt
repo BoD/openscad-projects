@@ -44,33 +44,56 @@ import kotlin.math.sqrt
 
 @Composable
 private fun Main(ballDiameter: Double) {
+  // Balls are 1/5 of the diameter, links are 1/20 of the diameter.
   val diameter = ballDiameter * 5
   val linkDiameter = diameter / 20.0
   val cutSize = (ballDiameter - linkDiameter) / 2
+
+  val magnetDiameter = 3.0
+  val magnetHeight = 2.0
+
+  // GraphQL magnet
+  Comment("GraphQL magnet")
   difference {
     translate(z = ballDiameter / 2 - cutSize) {
-      GraphQL(ballDiameter)
+      GraphQL(
+        ballDiameter = ballDiameter,
+        diameter = diameter,
+        linkDiameter = linkDiameter,
+        magnetDiameter = magnetDiameter,
+        magnetHeight = magnetHeight,
+        cutSize = cutSize,
+      )
     }
 
     // Cut it out a bit so it adheres better to the plate
     Comment("Cut out")
-    translate(-20, -20, -ballDiameter) {
-      Cube(40, 40, ballDiameter)
+    translate(-diameter, -diameter, -ballDiameter) {
+      Cube(diameter * 2, diameter * 2, ballDiameter)
     }
+  }
+
+  // Stem
+  Comment("Stem")
+  translate(x = diameter) {
+    Stem(
+      diameter = diameter,
+      magnetDiameter = magnetDiameter,
+      magnetHeight = magnetHeight,
+    )
   }
 }
 
 @Composable
-private fun GraphQL(ballDiameter: Double) {
-  // Balls are 1/5 of the diameter, links are 1/20 of the diameter.
-
-  val diameter = ballDiameter * 5
-
+private fun GraphQL(
+  ballDiameter: Double,
+  diameter: Double,
+  linkDiameter: Double,
+  magnetDiameter: Double,
+  magnetHeight: Double,
+  cutSize: Double,
+) {
   val radius = diameter / 2
-  val linkDiameter = diameter / 20.0
-
-  val magnetDiameter = 3.0
-  val magnetHeight = 2.0
 
   difference {
     union {
@@ -113,13 +136,11 @@ private fun GraphQL(ballDiameter: Double) {
 
     // Magnet holes (only for top and bottom balls)
     Comment("Magnet holes")
-    union {
-      for (i in 0..5) {
-        if (i == 0 || i == 3) {
-          rotate(z = i * 360.0 / 6 - (360.0 / 6) * 1.5) {
-            translate(x = radius, z = -8 + magnetHeight) {
-              Cylinder(height = 8, diameter = magnetDiameter)
-            }
+    for (i in 0..5) {
+      if (i == 0 || i == 3) {
+        rotate(z = i * 360.0 / 6 - (360.0 / 6) * 1.5) {
+          translate(x = radius, z = -(ballDiameter / 2 - cutSize)) {
+            Cylinder(height = magnetHeight, diameter = magnetDiameter)
           }
         }
       }
@@ -127,10 +148,43 @@ private fun GraphQL(ballDiameter: Double) {
   }
 }
 
+@Composable
+private fun Stem(
+  diameter: Double,
+  magnetDiameter: Double,
+  magnetHeight: Double,
+) {
+  val holderThickness = .6
+  difference {
+    union {
+      Cylinder(height = magnetHeight + holderThickness, diameter = magnetDiameter + holderThickness * 2)
+      translate(x = diameter) {
+        Cylinder(height = magnetHeight + holderThickness, diameter = magnetDiameter + holderThickness * 2)
+      }
+
+      // Strip
+      val width = magnetDiameter + holderThickness * 2
+      translate(y = -width / 2) {
+        Cube(
+          x = diameter,
+          y = width,
+          z = .6,
+        )
+      }
+    }
+
+    // Magnet holes
+    Cylinder(height = magnetHeight, diameter = magnetDiameter)
+    translate(x = diameter) {
+      Cylinder(height = magnetHeight, diameter = magnetDiameter)
+    }
+  }
+}
+
 fun main() {
   openScad(
     SystemFileSystem.sink(Path("/Users/bod/Tmp/graphql.scad")).buffered(),
-    fa = .1,
+    fa = .05,
     fs = .05,
   ) {
     Main(6.0)
