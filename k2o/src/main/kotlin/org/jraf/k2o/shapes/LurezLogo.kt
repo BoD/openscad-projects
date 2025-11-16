@@ -7,7 +7,7 @@ import org.jraf.k2o.stdlib.resize
 
 @Composable
 fun LurezLogo(
-  width: Double,
+  width: Number,
   thickness: Number,
 ) {
   linearExtrude(height = thickness) {

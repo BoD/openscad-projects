@@ -23,16 +23,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("SameParameterValue")
+
 package org.jraf.k2o.projects
 
 import androidx.compose.runtime.Composable
-import kotlinx.io.asSink
 import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
-import org.jraf.k2o.stdlib.Call
+import org.jraf.k2o.shapes.LurezLogo
 import org.jraf.k2o.stdlib.Circle
 import org.jraf.k2o.stdlib.Square
-import org.jraf.k2o.stdlib.Use
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.rotateExtrude
@@ -53,7 +55,7 @@ private fun crossSection(
         Square(
           borderHeight,
           thickness,
-        );
+        )
       }
     }
   }
@@ -70,13 +72,11 @@ private fun crossSection(
 
 @Composable
 private fun PotPlate() {
-  val diameter = 180
+  val diameter = 140
   val thickness = 4
-  val borderHeight = 15
+  val borderHeight = 25
   val borderAngle = 45
   val logoThickness = 1
-
-  Use("../lurez-logo/lurez-logo.scad")
 
   difference {
     rotateExtrude {
@@ -89,17 +89,16 @@ private fun PotPlate() {
     }
 
     translate(0, 0, thickness - logoThickness) {
-      Call(
-        "lurez_logo",
-        "width" to 140,
-        "thickness" to logoThickness,
+      LurezLogo(
+        width = 120,
+        thickness = logoThickness,
       )
     }
   }
 }
 
 fun main() {
-  openScad(System.out.asSink().buffered()) {
+  openScad(SystemFileSystem.sink(Path("/Users/bod/Tmp/pot-plate.scad")).buffered()) {
     PotPlate()
   }
 }
