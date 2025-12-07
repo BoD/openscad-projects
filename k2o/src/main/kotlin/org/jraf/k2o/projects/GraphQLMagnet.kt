@@ -56,7 +56,7 @@ private fun Main(ballDiameter: Double) {
   Comment("GraphQL magnet")
   difference {
     translate(z = ballDiameter / 2 - cutSize) {
-      GraphQL(
+      GraphQLMagnet(
         ballDiameter = ballDiameter,
         diameter = diameter,
         linkDiameter = linkDiameter,
@@ -85,7 +85,7 @@ private fun Main(ballDiameter: Double) {
 }
 
 @Composable
-private fun GraphQL(
+private fun GraphQLMagnet(
   ballDiameter: Double,
   diameter: Double,
   linkDiameter: Double,
