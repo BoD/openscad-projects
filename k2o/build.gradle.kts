@@ -10,5 +10,5 @@ kotlin {
 
 dependencies {
   // k2o
-  implementation("org.jraf:k2o:_")
+  implementation("org.jraf.k2o:k2o:_")
 }
