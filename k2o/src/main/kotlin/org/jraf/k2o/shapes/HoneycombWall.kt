@@ -37,6 +37,7 @@ import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
+import org.jraf.k2o.stdlib.union
 import kotlin.math.sqrt
 
 @Composable
@@ -53,45 +54,67 @@ fun HoneycombWall(
   val diameter = diameter.toDouble()
   val spacing = spacing.toDouble()
 
-  difference {
+  val radius = diameter / 2.0
+  val apothem = (sqrt(3.0) / 2.0) * radius
+
+  val rowCount = ((y - radius / 2.0) / (diameter - radius / 2.0 + spacing)).toInt()
+  val columnCount = (x / (apothem * 2.0 + spacing)).toInt()
+
+  val marginY = (y - (rowCount * (diameter - radius / 2.0 + spacing) + radius / 2.0)) / 2.0
+  val marginX = (x - columnCount * (apothem * 2.0 + spacing)) / 2.0
+
+  union {
+    difference {
+      Cube(
+        x = x,
+        y = y,
+        z = z,
+      )
+
+      repeat(rowCount) { y ->
+        repeat(columnCount + if (y % 2 == 0) 0 else 1) { x ->
+          translate(
+            x = marginX +
+              radius +
+              spacing / 2.0 +
+              x * (apothem * 2.0 + spacing) +
+              (if (y % 2 == 0) 0.0 else -apothem - spacing / 2.0) -
+              (radius - apothem),
+            y = marginY +
+              radius +
+              spacing / 2.0 +
+              y * (diameter - radius / 2.0 + spacing),
+          ) {
+            rotate(90) {
+              Cylinder(
+                height = z,
+                diameter = diameter,
+                segments = 6,
+              )
+            }
+          }
+        }
+      }
+    }
+
+    // Left edge
     Cube(
-      x = x,
+      x = marginX +
+        spacing / 2.0,
       y = y,
       z = z,
     )
 
-    val radius = diameter / 2.0
-    val apothem = (sqrt(3.0) / 2.0) * radius
-
-    val rowCount = ((y - radius / 2.0) / (diameter - radius / 2.0 + spacing)).toInt()
-    val columnCount = (x / (apothem * 2.0 + spacing)).toInt()
-
-    val marginY = (y - (rowCount * (diameter - radius / 2.0 + spacing) + radius / 2.0)) / 2.0
-    val marginX = (x - columnCount * (apothem * 2.0 + spacing)) / 2.0
-
-    repeat(rowCount) { y ->
-      repeat(columnCount - if (y % 2 == 0) 0 else 1) { x ->
-        translate(
-          x = marginX +
-            radius +
-            spacing / 2.0 +
-            x * (apothem * 2.0 + spacing) +
-            (if (y % 2 == 0) 0.0 else apothem + spacing / 2.0) -
-            (radius - apothem),
-          y = marginY +
-            radius +
-            spacing / 2.0 +
-            y * (diameter - radius / 2.0 + spacing),
-        ) {
-          rotate(90) {
-            Cylinder(
-              height = z,
-              diameter = diameter,
-              segments = 6,
-            )
-          }
-        }
-      }
+    // Right edge
+    translate(
+      x = x - marginX - spacing / 2.0,
+    ) {
+      Cube(
+        x = marginX +
+          spacing / 2.0,
+        y = y,
+        z = z,
+      )
     }
   }
 }
@@ -99,11 +122,11 @@ fun HoneycombWall(
 fun main() {
   openScad(SystemFileSystem.sink(Path("/Users/bod/Tmp/honeycomb-wall.scad")).buffered()) {
     HoneycombWall(
-      x = 9.67,
-      y = 11,
+      x = 320,
+      y = 200,
       z = 10,
-      diameter = 10,
-      spacing = 1,
+      diameter = 20,
+      spacing = 4,
     )
   }
 }
