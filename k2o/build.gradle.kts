@@ -1,7 +1,7 @@
 plugins {
-  kotlin("jvm")
-  id("org.jetbrains.compose")
-  kotlin("plugin.compose")
+  alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.compose)
+  alias(libs.plugins.kotlin.compose)
 }
 
 kotlin {
@@ -10,5 +10,5 @@ kotlin {
 
 dependencies {
   // k2o
-  implementation("org.jraf.k2o:k2o:_")
+  implementation(libs.k2o)
 }
