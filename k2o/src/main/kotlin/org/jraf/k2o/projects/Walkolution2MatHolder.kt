@@ -32,64 +32,51 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
-import org.jraf.k2o.shapes.ExtrudedRoundedSquare
-import org.jraf.k2o.shapes.LurezLogo
-import org.jraf.k2o.stdlib.Cube
-import org.jraf.k2o.stdlib.difference
+import org.jraf.k2o.shapes.RoundedExtrudedRoundedSquare
 import org.jraf.k2o.stdlib.translate
 
 @Composable
 private fun Main() {
-  val soapHolderLengthX = 131.4
-  val soapHolderLengthY = 83.4
-  val soapHolderLengthZ = 24.4
+  val lengthZ = 9.0
+  val lengthX = 15.0
+  val lengthY = 100.0
+  val thickness = 6.0
 
-  val wallThickness = 1.0
-  val wallHeight = soapHolderLengthZ / 4
-
-  val tolerance = 1.0
-
-  val lengthX = soapHolderLengthX + wallThickness * 2 + tolerance
-  val lengthY = soapHolderLengthY + wallThickness * 2 + tolerance
-  difference {
-    ExtrudedRoundedSquare(
-      x = lengthX,
-      y = lengthY,
-      z = wallHeight + wallThickness,
-      radius = 1,
-    )
-
-    translate(
-      x = wallThickness,
-      y = wallThickness,
-      z = wallThickness,
-    ) {
-      Cube(
-        x = soapHolderLengthX + tolerance,
-        y = soapHolderLengthY + tolerance,
-        z = wallHeight,
-      )
-    }
-
-    // Lurez logo
-    translate(
-      x = lengthX / 4 + lengthX / 2 - (lengthX / 2) / 2,
-      y = lengthY / 4 + lengthY / 2 - (lengthY / 2) / 2,
-      z = wallThickness - wallThickness / 3,
-    ) {
-      LurezLogo(
-        width = lengthX / 2,
-        thickness = 1,
-      )
-    }
+  horizontalPart(lengthX = lengthX, thickness = thickness, lengthY = lengthY)
+  translate(z = lengthZ + thickness) {
+    horizontalPart(lengthX = lengthX, thickness = thickness, lengthY = lengthY)
   }
+  RoundedExtrudedRoundedSquare(
+    x = thickness,
+    y = lengthY,
+    z = lengthZ + thickness * 2,
+    topLeftRadius = 0,
+    topRightRadius = 0,
+    bottomRightRadius = 0,
+    bottomLeftRadius = 0,
+    roundingRadius = thickness / 2,
+  )
+}
+
+@Composable
+private fun horizontalPart(lengthX: Double, thickness: Double, lengthY: Double) {
+  RoundedExtrudedRoundedSquare(
+    x = lengthX + thickness,
+    y = lengthY,
+    z = thickness,
+    topLeftRadius = 0,
+    topRightRadius = lengthX,
+    bottomRightRadius = lengthX,
+    bottomLeftRadius = 0,
+    roundingRadius = thickness / 2,
+  )
 }
 
 fun main() {
   openScad(
-    SystemFileSystem.sink(Path("/Users/bod/Tmp/soap-holder-dip-tray.scad")).buffered(),
-    fa = .1,
-    fs = .1,
+    SystemFileSystem.sink(Path("/Users/bod/Tmp/walkolution2-mat-holder.scad")).buffered(),
+    fa = .25,
+    fs = .25,
   ) {
     Main()
   }
