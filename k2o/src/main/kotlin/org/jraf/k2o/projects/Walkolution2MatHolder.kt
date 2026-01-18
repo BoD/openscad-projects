@@ -37,9 +37,9 @@ import org.jraf.k2o.stdlib.translate
 
 @Composable
 private fun Main() {
-  val lengthZ = 9.0
+  val lengthZ = 8.5
   val lengthX = 15.0
-  val lengthY = 100.0
+  val lengthY = 120.0
   val thickness = 6.0
 
   horizontalPart(lengthX = lengthX, thickness = thickness, lengthY = lengthY)

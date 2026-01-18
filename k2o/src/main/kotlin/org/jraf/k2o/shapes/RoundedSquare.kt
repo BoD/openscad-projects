@@ -85,8 +85,8 @@ fun RoundedSquare(
         }
       }
     } else {
-      translate(x = 0, y = y - SMALLEST_SQUARE) {
-        Square(SMALLEST_SQUARE)
+      translate(x = 0, y = y - SMALLEST_LENGTH) {
+        Square(SMALLEST_LENGTH)
       }
     }
     if (topRightRadius > 0) {
@@ -103,8 +103,8 @@ fun RoundedSquare(
         }
       }
     } else {
-      translate(x = x - SMALLEST_SQUARE, y = y - SMALLEST_SQUARE) {
-        Square(SMALLEST_SQUARE)
+      translate(x = x - SMALLEST_LENGTH, y = y - SMALLEST_LENGTH) {
+        Square(SMALLEST_LENGTH)
       }
     }
 
@@ -122,8 +122,8 @@ fun RoundedSquare(
         }
       }
     } else {
-      translate(x = x - SMALLEST_SQUARE, y = 0) {
-        Square(SMALLEST_SQUARE)
+      translate(x = x - SMALLEST_LENGTH, y = 0) {
+        Square(SMALLEST_LENGTH)
       }
     }
 
@@ -141,7 +141,7 @@ fun RoundedSquare(
         }
       }
     } else {
-      Square(SMALLEST_SQUARE)
+      Square(SMALLEST_LENGTH)
     }
   }
 }

@@ -30,59 +30,50 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.stdlib.Cube
+import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.Sphere
-import org.jraf.k2o.stdlib.linearExtrude
+import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.minkowski
 import org.jraf.k2o.stdlib.translate
 
 @Composable
-fun RoundedExtrudedRoundedSquare(
-  x: Number,
-  y: Number,
-  z: Number,
-  topLeftRadius: Number = 0,
-  topRightRadius: Number = 0,
-  bottomRightRadius: Number = 0,
-  bottomLeftRadius: Number = 0,
-  roundingRadius: Number,
+fun RoundedHalfCylinder(
+  height: Number,
+  radius: Number,
+  thickness: Number,
 ) {
-  val x = x.toDouble()
-  val y = y.toDouble()
-  val z = z.toDouble()
-  val roundingRadius = roundingRadius.toDouble()
-  translate(roundingRadius, roundingRadius, roundingRadius) {
-    minkowski {
-      linearExtrude((z - roundingRadius * 2).coerceAtLeast(SMALLEST_LENGTH)) {
-        RoundedSquare(
-          x = x - roundingRadius * 2,
-          y = y - roundingRadius * 2,
-          topLeftRadius = topLeftRadius,
-          topRightRadius = topRightRadius,
-          bottomRightRadius = bottomRightRadius,
-          bottomLeftRadius = bottomLeftRadius,
-        )
-      }
+  val height = height.toDouble()
+  val radius = radius.toDouble()
+  val thickness = thickness.toDouble()
 
-      Sphere(roundingRadius)
+  translate(
+    z = thickness / 2,
+  ) {
+    minkowski {
+      difference {
+        Cylinder(height = height - thickness, radius = radius - thickness / 2)
+        Cylinder(height = height - thickness, radius = radius - thickness / 2 - SMALLEST_LENGTH)
+        // Cut half
+        translate(x = -radius, y = -radius) {
+          Cube(x = radius * 2, y = radius, z = height)
+        }
+      }
+      Sphere(thickness / 2)
     }
   }
 }
 
 fun main() {
   openScad(
-    SystemFileSystem.sink(Path("/Users/bod/Tmp/rounded-extruded-rounded-square.scad")).buffered(),
+    SystemFileSystem.sink(Path("/Users/bod/Tmp/rounded-half-cylinder.scad")).buffered(),
     fa = 1.0,
     fs = 1.0,
   ) {
-    RoundedExtrudedRoundedSquare(
-      x = 320,
-      y = 200,
-      z = 20,
-      topLeftRadius = 0,
-      topRightRadius = 50,
-      bottomRightRadius = 50,
-      bottomLeftRadius = 0,
-      roundingRadius = 10,
+    RoundedHalfCylinder(
+      height = 100,
+      radius = 50,
+      thickness = 5,
     )
   }
 }
