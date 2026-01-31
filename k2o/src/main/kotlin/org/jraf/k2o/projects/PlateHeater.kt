@@ -37,6 +37,7 @@ import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.Sphere
 import org.jraf.k2o.stdlib.Square
 import org.jraf.k2o.stdlib.difference
+import org.jraf.k2o.stdlib.hull
 import org.jraf.k2o.stdlib.linearExtrude
 import org.jraf.k2o.stdlib.minkowski
 import org.jraf.k2o.stdlib.rotate
@@ -50,76 +51,82 @@ private fun Main() {
   val wallThickness = 3.mm
   val candleDiameter = 38.5.mm
   val candleHeight = 15.mm
-  val plateBaseDiameter = 13.cm
+  val plateBaseDiameter = 15.cm
 
   val armLength = plateBaseDiameter / 2
   val armWidth = 1.5.cm
 
+  val armCount = 3
+
   val candleHolderShiftX = -candleDiameter / 2 - wallThickness * 4
+
   difference {
     union {
-      // Candle holder 1
-      translate(x = candleHolderShiftX) {
-        CandleHolder(
-          wallThickness = wallThickness,
-          candleDiameter = candleDiameter,
-        )
-      }
-
-      // Candle holder 2
-      rotate(z = 120) {
-        translate(x = candleHolderShiftX) {
-          CandleHolder(
+      // Arms
+      for (i in 0..<armCount) {
+        rotate(z = i * 360.0 / armCount) {
+          Arm(
+            armWidth = armWidth,
             wallThickness = wallThickness,
-            candleDiameter = candleDiameter,
+            armLength = armLength,
+            candleHeight = candleHeight,
           )
         }
-      }
-
-      // Candle holder 3
-      rotate(z = 240) {
-        translate(x = candleHolderShiftX) {
-          CandleHolder(
-            wallThickness = wallThickness,
-            candleDiameter = candleDiameter,
-          )
-        }
-      }
-
-      // Arm 1
-      Arm(
-        armWidth = armWidth,
-        wallThickness = wallThickness,
-        armLength = armLength,
-        candleHeight = candleHeight,
-      )
-
-      // Arm 2
-      rotate(z = 120) {
-        Arm(
-          armWidth = armWidth,
-          wallThickness = wallThickness,
-          armLength = armLength,
-          candleHeight = candleHeight,
-        )
-      }
-
-      // Arm 3
-      rotate(z = 240) {
-        Arm(
-          armWidth = armWidth,
-          wallThickness = wallThickness,
-          armLength = armLength,
-          candleHeight = candleHeight,
-        )
       }
     }
 
     // Middle hole
     Cylinder(
       height = wallThickness,
-      diameter = (-candleHolderShiftX - (candleDiameter + wallThickness * 2) / 2) * 2,
+      diameter = (-candleHolderShiftX - (candleDiameter + wallThickness * 2) / 2) * 3.4,
     )
+
+    // Arm holes
+    for (i in 0..<armCount) {
+      rotate(z = i * 360.0 / armCount) {
+        hull {
+          Cylinder(
+            height = wallThickness,
+            diameter = armWidth / 1.37,
+          )
+
+          translate(x = armLength * .9) {
+            Cylinder(
+              height = wallThickness,
+              diameter = armWidth / 3,
+            )
+          }
+        }
+      }
+    }
+  }
+
+  // Candle holder 1
+  translate(x = candleHolderShiftX) {
+    CandleHolder(
+      wallThickness = wallThickness,
+      candleDiameter = candleDiameter,
+    )
+  }
+
+  // Candle holder 2
+  rotate(z = 120) {
+    translate(x = candleHolderShiftX) {
+      CandleHolder(
+        wallThickness = wallThickness,
+        candleDiameter = candleDiameter,
+      )
+    }
+  }
+
+  // Candle holder 3
+  rotate(z = 240) {
+    translate(x = candleHolderShiftX) {
+      CandleHolder(
+        wallThickness = wallThickness,
+        candleDiameter = candleDiameter,
+      )
+    }
   }
 }
 
@@ -161,7 +168,7 @@ private fun Arm(
           translate(x = armLength) {
             Square(width = SMALLEST_LENGTH, height = candleHeight * 2)
           }
-          val armTopLength = armLength / 5
+          val armTopLength = armLength / 10
           translate(
             x = armLength - armTopLength + SMALLEST_LENGTH,
             y = candleHeight * 2,
