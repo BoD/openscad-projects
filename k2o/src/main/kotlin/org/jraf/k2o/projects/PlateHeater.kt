@@ -51,7 +51,7 @@ private fun Main() {
   val wallThickness = 3.mm
   val candleDiameter = 38.5.mm
   val candleHeight = 15.mm
-  val plateBaseDiameter = 15.cm
+  val plateBaseDiameter = 13.5.cm
 
   val armLength = plateBaseDiameter / 2
   val armWidth = 1.5.cm
@@ -87,7 +87,7 @@ private fun Main() {
         hull {
           Cylinder(
             height = wallThickness,
-            diameter = armWidth / 1.37,
+            diameter = armWidth / 1.35,
           )
 
           translate(x = armLength * .9) {
