@@ -5,6 +5,9 @@ import org.jraf.k2o.stdlib.Import
 import org.jraf.k2o.stdlib.linearExtrude
 import org.jraf.k2o.stdlib.resize
 
+/**
+ * Aspect ratio: 4:3
+ */
 @Composable
 fun LurezLogo(
   width: Number,

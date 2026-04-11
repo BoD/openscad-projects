@@ -5,3 +5,4 @@ out
 .gradle
 rpi/
 can-lid/
+versions.properties

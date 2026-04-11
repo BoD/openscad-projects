@@ -77,7 +77,7 @@ fun main() {
     RoundedExtrudedRoundedSquare(
       x = 320,
       y = 200,
-      z = 20,
+      z = 100,
       topLeftRadius = 0,
       topRightRadius = 50,
       bottomRightRadius = 50,
