@@ -6,6 +6,11 @@ plugins {
 
 kotlin {
   jvmToolchain(17)
+
+  compilerOptions {
+    // See https://kotlinlang.org/docs/whatsnew-eap.html#support-for-collection-literals
+    freeCompilerArgs.add("-Xcollection-literals")
+  }
 }
 
 dependencies {

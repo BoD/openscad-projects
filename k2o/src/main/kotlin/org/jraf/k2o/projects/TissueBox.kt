@@ -33,6 +33,8 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.math.cos
+import org.jraf.k2o.projects.BoxSize.Big
+import org.jraf.k2o.projects.BoxSize.Small
 import org.jraf.k2o.shapes.ExtrudedRoundedSquare
 import org.jraf.k2o.shapes.HoneycombWall
 import org.jraf.k2o.shapes.LurezLogo
@@ -46,11 +48,21 @@ import org.jraf.k2o.stdlib.union
 import org.jraf.k2o.util.cm
 import org.jraf.k2o.util.mm
 
+private enum class BoxSize {
+  Small, Big,
+}
+
 @Composable
-private fun Main() {
+private fun Main(boxSize: BoxSize) {
   val boxSizeX = 22.7.cm
   val boxSizeY = 11.4.cm
-  val boxSizeZ = 5.8.cm
+
+  val boxSizeZ = when (boxSize) {
+    Small -> 5.8.cm
+    Big -> 8.2.cm
+  }
+
+
   val wallThickness = 4.mm
 
   val slideIndentSize = wallThickness / 2
@@ -154,13 +166,13 @@ private fun TissueBox(
 
     // Slide indent
     translate(
-      x = slideIndentSize,
-      y = slideIndentSize,
+      x = wallThickness - slideIndentSize,
+      y = wallThickness - slideIndentSize,
       z = marginForSlidingBottom,
     ) {
       ExtrudedRoundedSquare(
-        x = interiorSizeX + slideIndentSize * 3,
-        y = interiorSizeY + slideIndentSize * 2,
+        x = interiorSizeX + slideIndentSize * 2,
+        y = interiorSizeY + slideIndentSize * 3,
         z = wallThickness,
         radius = slidingBottomRadius,
       )
@@ -168,11 +180,11 @@ private fun TissueBox(
 
     // Cut hanging bit
     translate(
-      x = exteriorSizeX - exteriorRoundingRadius,
+      y = exteriorSizeY - exteriorRoundingRadius,
     ) {
       Cube(
-        x = wallThickness * 4,
-        y = exteriorSizeY,
+        x = exteriorSizeX,
+        y = wallThickness * 4,
         z = wallThickness + marginForSlidingBottom,
       )
     }
@@ -223,8 +235,8 @@ private fun SlidingBottomPart(
       color("blue") {
         difference {
           ExtrudedRoundedSquare(
-            x = boxSizeX + marginDueToRoundingRadius * 2 + slideIndentSize * 3 - tolerance * 2,
-            y = boxSizeY + marginDueToRoundingRadius * 2 + slideIndentSize * 2 - tolerance * 2,
+            x = boxSizeX + marginDueToRoundingRadius * 2 + slideIndentSize * 2 - tolerance * 2,
+            y = boxSizeY + marginDueToRoundingRadius * 2 + slideIndentSize * 3 - tolerance * 2,
             z = bottomPartThickness,
             radius = slidingBottomRadius,
           )
@@ -233,8 +245,8 @@ private fun SlidingBottomPart(
             y = someMargin,
           ) {
             Cube(
-              x = boxSizeX + marginDueToRoundingRadius * 2 + slideIndentSize * 3 - someMargin * 2 - tolerance * 2,
-              y = boxSizeY + marginDueToRoundingRadius * 2 + slideIndentSize * 2 - someMargin * 2 - tolerance * 2,
+              x = boxSizeX + marginDueToRoundingRadius * 2 + slideIndentSize * 2 - someMargin * 2 - tolerance * 2,
+              y = boxSizeY + marginDueToRoundingRadius * 2 + slideIndentSize * 3 - someMargin * 2 - tolerance * 2,
               z = bottomPartThickness,
             )
           }
@@ -247,8 +259,8 @@ private fun SlidingBottomPart(
           y = someMargin,
         ) {
           HoneycombWall(
-            x = boxSizeX + marginDueToRoundingRadius * 2 + slideIndentSize * 3 - someMargin * 2 - tolerance * 2,
-            y = boxSizeY + marginDueToRoundingRadius * 2 + slideIndentSize * 2 - someMargin * 2 - tolerance * 2,
+            x = boxSizeX + marginDueToRoundingRadius * 2 + slideIndentSize * 2 - someMargin * 2 - tolerance * 2,
+            y = boxSizeY + marginDueToRoundingRadius * 2 + slideIndentSize * 3 - someMargin * 2 - tolerance * 2,
             z = bottomPartThickness,
             diameter = 2.5.cm,
             spacing = 1.mm,
@@ -272,6 +284,6 @@ fun main() {
   openScad(
     SystemFileSystem.sink(Path("/Users/bod/Tmp/tissue-box.scad")).buffered(),
   ) {
-    Main()
+    Main(Small)
   }
 }

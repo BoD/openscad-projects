@@ -1,10 +1,12 @@
 [versions]
-kotlin = "2.3.0"
+kotlin = "2.4.0-Beta2"
+compose = "1.10.3"
+k2o = "1.2.1"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-compose = { id = "org.jetbrains.compose", version = "1.9.3" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 [libraries]
-k2o = "org.jraf.k2o:k2o:1.2.0"
+k2o = { group = "org.jraf.k2o", name = "k2o", version.ref = "k2o" }
