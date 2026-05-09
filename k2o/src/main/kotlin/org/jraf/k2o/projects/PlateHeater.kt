@@ -50,36 +50,66 @@ import org.jraf.k2o.util.mm
 private fun Main() {
   val wallThickness = 3.mm
   val candleDiameter = 38.5.mm
-  val candleHeight = 15.mm
   val plateBaseDiameter = 13.5.cm
 
-  val armLength = plateBaseDiameter / 2
-  val armWidth = 1.5.cm
+  val candleHolderRadius = 4.cm
 
   val armCount = 3
 
-  val candleHolderShiftX = -candleDiameter / 2 - wallThickness * 4
+  val armLengthX = plateBaseDiameter / 2
+  val armLengthY = 1.5.cm
+  val armLengthZ = 4.cm
+
 
   difference {
     union {
-      // Arms
+      difference {
+        union {
+          // Arms
+          for (i in 0..<armCount) {
+            rotate(z = i * 360.0 / armCount) {
+              Arm(
+                armLengthX = armLengthX,
+                armLengthY = armLengthY,
+                armLengthZ = armLengthZ,
+                wallThickness = wallThickness,
+              )
+            }
+          }
+        }
+
+        // Center circle hole
+        Cylinder(
+          height = wallThickness,
+          radius = candleHolderRadius - wallThickness / 2,
+        )
+      }
+
+      // Candle holders
       for (i in 0..<armCount) {
-        rotate(z = i * 360.0 / armCount) {
-          Arm(
-            armWidth = armWidth,
-            wallThickness = wallThickness,
-            armLength = armLength,
-            candleHeight = candleHeight,
-          )
+        rotate(z = i * 360.0 / armCount + 360.0 / armCount / 2) {
+          translate(x = candleHolderRadius) {
+            CandleHolder(
+              wallThickness = wallThickness,
+              candleDiameter = candleDiameter,
+            )
+          }
         }
       }
-    }
 
-    // Middle hole
-    Cylinder(
-      height = wallThickness,
-      diameter = (-candleHolderShiftX - (candleDiameter + wallThickness * 2) / 2) * 3.4,
-    )
+      // Center circle
+      difference {
+        Cylinder(
+          height = wallThickness,
+          radius = candleHolderRadius + wallThickness / 2,
+        )
+
+        Cylinder(
+          height = wallThickness,
+          radius = candleHolderRadius - wallThickness / 2,
+        )
+      }
+    }
 
     // Arm holes
     for (i in 0..<armCount) {
@@ -87,45 +117,29 @@ private fun Main() {
         hull {
           Cylinder(
             height = wallThickness,
-            diameter = armWidth / 1.35,
+            diameter = armLengthY,
           )
 
-          translate(x = armLength * .9) {
+          translate(x = armLengthX * .9) {
             Cylinder(
               height = wallThickness,
-              diameter = armWidth / 3,
+              diameter = armLengthY / 2,
             )
           }
         }
       }
     }
-  }
 
-  // Candle holder 1
-  translate(x = candleHolderShiftX) {
-    CandleHolder(
-      wallThickness = wallThickness,
-      candleDiameter = candleDiameter,
-    )
-  }
-
-  // Candle holder 2
-  rotate(z = 120) {
-    translate(x = candleHolderShiftX) {
-      CandleHolder(
-        wallThickness = wallThickness,
-        candleDiameter = candleDiameter,
-      )
-    }
-  }
-
-  // Candle holder 3
-  rotate(z = 240) {
-    translate(x = candleHolderShiftX) {
-      CandleHolder(
-        wallThickness = wallThickness,
-        candleDiameter = candleDiameter,
-      )
+    // Candle holders holes
+    for (i in 0..<armCount) {
+      rotate(z = i * 360.0 / armCount + 360.0 / armCount / 2) {
+        translate(x = candleHolderRadius) {
+          Cylinder(
+            height = wallThickness,
+            diameter = candleDiameter - wallThickness * 2,
+          )
+        }
+      }
     }
   }
 }
@@ -152,26 +166,26 @@ private fun CandleHolder(wallThickness: Double, candleDiameter: Double) {
 
 @Composable
 private fun Arm(
-  armWidth: Double,
+  armLengthX: Double,
+  armLengthY: Double,
+  armLengthZ: Double,
   wallThickness: Double,
-  armLength: Double,
-  candleHeight: Double,
 ) {
   translate(
-    y = armWidth / 2,
+    y = armLengthY / 2,
     z = wallThickness / 2 - SMALLEST_LENGTH,
   ) {
     rotate(x = 90) {
       minkowski {
-        linearExtrude(armWidth) {
-          Square(width = armLength, height = SMALLEST_LENGTH)
-          translate(x = armLength) {
-            Square(width = SMALLEST_LENGTH, height = candleHeight * 2)
+        linearExtrude(armLengthY) {
+          Square(width = armLengthX, height = SMALLEST_LENGTH)
+          translate(x = armLengthX) {
+            Square(width = SMALLEST_LENGTH, height = armLengthZ)
           }
-          val armTopLength = armLength / 10
+          val armTopLength = armLengthX / 10
           translate(
-            x = armLength - armTopLength + SMALLEST_LENGTH,
-            y = candleHeight * 2,
+            x = armLengthX - armTopLength + SMALLEST_LENGTH,
+            y = armLengthZ,
           ) {
             Square(width = armTopLength, height = SMALLEST_LENGTH)
           }
