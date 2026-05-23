@@ -32,7 +32,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
-import org.jraf.k2o.shapes.LurezLogo
+import org.jraf.k2o.shapes.LzLogo
 import org.jraf.k2o.stdlib.Cube
 import org.jraf.k2o.stdlib.Import
 import org.jraf.k2o.stdlib.difference
@@ -82,7 +82,7 @@ private fun Main() {
         // Lz logo
         translate(z = wallWidth / 2) {
           rotate(90) {
-            LurezLogo(width = diameter * .6, thickness = wallWidth / 2)
+            LzLogo(width = diameter * .6, thickness = wallWidth / 2)
           }
         }
       }

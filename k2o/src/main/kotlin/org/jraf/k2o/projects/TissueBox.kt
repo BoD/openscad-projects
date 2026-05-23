@@ -37,7 +37,7 @@ import org.jraf.k2o.projects.BoxSize.Big
 import org.jraf.k2o.projects.BoxSize.Small
 import org.jraf.k2o.shapes.ExtrudedRoundedSquare
 import org.jraf.k2o.shapes.HoneycombWall
-import org.jraf.k2o.shapes.LurezLogo
+import org.jraf.k2o.shapes.LzLogo
 import org.jraf.k2o.stdlib.Cube
 import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.color
@@ -207,7 +207,7 @@ private fun TissueBox(
       y = logoMargin + logoSizeY / 2,
       z = exteriorSizeZ - wallThickness / 2,
     ) {
-      LurezLogo(width = logoSizeX, thickness = wallThickness)
+      LzLogo(width = logoSizeX, thickness = wallThickness)
     }
   }
 }

@@ -32,7 +32,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
-import org.jraf.k2o.shapes.LurezLogo
+import org.jraf.k2o.shapes.LzLogo
 import org.jraf.k2o.stdlib.Circle
 import org.jraf.k2o.stdlib.Square
 import org.jraf.k2o.stdlib.difference
@@ -89,7 +89,7 @@ private fun PotPlate() {
     }
 
     translate(0, 0, thickness - logoThickness) {
-      LurezLogo(
+      LzLogo(
         width = 120,
         thickness = logoThickness,
       )

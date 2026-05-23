@@ -33,7 +33,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.shapes.ExtrudedRoundedSquare
-import org.jraf.k2o.shapes.LurezLogo
+import org.jraf.k2o.shapes.LzLogo
 import org.jraf.k2o.stdlib.Cube
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.translate
@@ -77,7 +77,7 @@ private fun Main() {
       y = lengthY / 4 + lengthY / 2 - (lengthY / 2) / 2,
       z = wallThickness - wallThickness / 3,
     ) {
-      LurezLogo(
+      LzLogo(
         width = lengthX / 2,
         thickness = 1,
       )
