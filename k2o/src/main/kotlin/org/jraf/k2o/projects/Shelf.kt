@@ -50,17 +50,17 @@ import org.jraf.k2o.util.mm
 
 @Composable
 private fun Main() {
-  val deckLenX = 22.cm
-  val deckLenY = 8.cm
+  val deckLenX = 20.cm
+  val deckLenY = 6.5.cm
   val deckLenZ = 4.mm
 
-  val guardrailLenZ = 3.cm
+  val guardrailLenZ = 3.5.cm
   val guardrailThickness = 4.mm
   val backPylonThickness = 2.mm
 
   val roundedCornerRadius = 1.cm
 
-  val supportLenZ = 1.cm
+  val supportLenZ = 1.5.cm
   val supportLenY = 2.mm
 
   val reinforcementThickness = 2.mm
