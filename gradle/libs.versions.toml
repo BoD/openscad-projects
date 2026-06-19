@@ -1,7 +1,7 @@
 [versions]
-kotlin = "2.4.0-Beta2"
-compose = "1.10.3"
-k2o = "1.2.1"
+kotlin = "2.4.0"
+compose = "1.11.1"
+k2o = "1.3.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

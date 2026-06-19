@@ -207,7 +207,7 @@ private fun Guardrail(
       )
 
       linearExtrude(height = guardrailThickness) {
-        offset(r = -guardrailThickness) {
+        offset(radius = -guardrailThickness) {
           RoundedSquare(
             x = deckLenX,
             y = deckLenY,

@@ -122,7 +122,7 @@ private fun Main() {
   }
 
   // Booster
-  color(Color.RED) {
+  color(Color.Red) {
     val displayBoosterDiameter = 3.mm
     translate(
       x = frameSideLength * 1.1,
