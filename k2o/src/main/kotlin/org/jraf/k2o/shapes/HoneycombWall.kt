@@ -40,6 +40,33 @@ import org.jraf.k2o.stdlib.translate
 import org.jraf.k2o.stdlib.union
 import kotlin.math.sqrt
 
+/**
+ * This diagram can help understand the placement of hexagons:
+ * ```svg
+ * <svg width="640" height="640" version="1.1" viewBox="0 0 640 640" xmlns="http://www.w3.org/2000/svg">
+ *  <g>
+ *   <g fill="none">
+ *    <path transform="matrix(1.624 0 0 1.624 118.33 23.164)" d="m141.5 82.07v61.224l-53.021 30.612-53.021-30.612v-61.224l53.021-30.612z" stroke="#000" stroke-width=".61376"/>
+ *    <path transform="matrix(1.624 0 0 1.624 357.74 23.164)" d="m141.5 82.07v61.224l-53.021 30.612-53.021-30.612v-61.224l53.021-30.612z" stroke="#000" stroke-width=".61376"/>
+ *    <circle cx="501.43" cy="206.15" r="99.472" stroke="#f00" stroke-width="1.0568"/>
+ *    <circle cx="262.02" cy="206.15" r="99.472" stroke="#f00" stroke-width="1.0568"/>
+ *    <path transform="matrix(1.624 0 0 1.624 -5.1184 240.86)" d="m141.5 82.07v61.224l-53.021 30.612-53.021-30.612v-61.224l53.021-30.612z" stroke="#000" stroke-width=".61376"/>
+ *    <path transform="matrix(1.624 0 0 1.624 234.29 240.86)" d="m141.5 82.07v61.224l-53.021 30.612-53.021-30.612v-61.224l53.021-30.612z" stroke="#000" stroke-width=".61376"/>
+ *    <circle cx="377.98" cy="423.85" r="99.472" stroke="#f00" stroke-width="1.0568"/>
+ *    <circle cx="138.57" cy="423.85" r="99.472" stroke="#f00" stroke-width="1.0568"/>
+ *   </g>
+ *   <g>
+ *    <path d="m348.15 202.1h67.544" fill="#00f" stroke="#00f"/>
+ *    <text x="381.9978" y="185.51425" fill="#0000ff" font-size="10.667px" stroke="#0000ff" text-align="center" text-anchor="middle" xml:space="preserve"><tspan x="381.9978" y="185.51425" font-family="Helvetica" font-size="10.667px" font-weight="300">Spacing</tspan></text>
+ *    <text x="255.71254" y="349.54388" fill="#ff00ff" font-size="10.667px" stroke="#0000ff" text-align="center" text-anchor="middle" xml:space="preserve"><tspan x="255.71254" y="349.54388" fill="#ff00ff" font-family="Helvetica" font-size="10.667px" font-weight="300" stroke="#ff00ff">r/2</tspan></text>
+ *    <path d="m246.04 304.58v67.544" fill="#00f" stroke="#00f"/>
+ *   </g>
+ *   <path d="m242.94 322.58 0.43788 49.498" fill="#ff0" stroke="#f0f" stroke-width=".49639"/>
+ *   <path d="m240.02 322.51v200.72" fill="#ff0" stroke="#f60"/>
+ *  </g>
+ * </svg>
+ * ```
+ */
 @Composable
 fun HoneycombWall(
   x: Number,
@@ -55,13 +82,18 @@ fun HoneycombWall(
   val spacing = spacing.toDouble()
 
   val radius = diameter / 2.0
+  // Amount to offset hexagons vertically so they fit adjacently together
+  val hexagonYOffset = radius / 2.0
   val apothem = (sqrt(3.0) / 2.0) * radius
+  val hexagonWidth = apothem * 2.0
 
-  val rowCount = ((y - radius / 2.0) / (diameter - radius / 2.0 + spacing)).toInt()
-  val columnCount = (x / (apothem * 2.0 + spacing)).toInt()
+  val columnCount = (x / (hexagonWidth + spacing)).toInt() + 1
+  // We always want an odd number of rows so that the hexagons on the top and bottom are aligned
+  val rowCount = (y / (diameter - hexagonYOffset + spacing)).toInt()
+    .let { if (it % 2 == 0) it + 1 else it + 2 }
 
-  val marginY = (y - (rowCount * (diameter - radius / 2.0 + spacing) + radius / 2.0)) / 2.0
-  val marginX = (x - columnCount * (apothem * 2.0 + spacing)) / 2.0
+  val exceedingX = (columnCount * (hexagonWidth + spacing) - spacing - x) / 2.0
+  val exceedingY = (rowCount * (diameter - hexagonYOffset + spacing) - spacing + hexagonYOffset - y) / 2.0
 
   union {
     difference {
@@ -71,26 +103,26 @@ fun HoneycombWall(
         z = z,
       )
 
-      repeat(rowCount) { y ->
-        repeat(columnCount + if (y % 2 == 0) 0 else 1) { x ->
+      repeat(rowCount) { row ->
+        repeat(columnCount + if (row % 2 == 0) 0 else 1) { col ->
           translate(
-            x = marginX +
-              radius +
-              spacing / 2.0 +
-              x * (apothem * 2.0 + spacing) +
-              (if (y % 2 == 0) 0.0 else -apothem - spacing / 2.0) -
-              (radius - apothem),
-            y = marginY +
-              radius +
-              spacing / 2.0 +
-              y * (diameter - radius / 2.0 + spacing),
+            x = col * (hexagonWidth + spacing) +
+              (if (row % 2 == 0) 0.0 else -apothem - spacing / 2.0)
+              - exceedingX,
+            y = row * (diameter - hexagonYOffset + spacing)
+              - exceedingY,
           ) {
-            rotate(90) {
-              Cylinder(
-                height = z,
-                diameter = diameter,
-                segments = 6,
-              )
+            translate(
+              x = apothem,
+              y = radius,
+            ) {
+              rotate(90) {
+                Cylinder(
+                  height = z,
+                  diameter = diameter,
+                  segments = 6,
+                )
+              }
             }
           }
         }
@@ -99,23 +131,39 @@ fun HoneycombWall(
 
     // Left edge
     Cube(
-      x = marginX +
-        spacing / 2.0,
+      x = spacing,
       y = y,
       z = z,
     )
 
     // Right edge
     translate(
-      x = x - marginX - spacing / 2.0,
+      x = x - spacing,
     ) {
       Cube(
-        x = marginX +
-          spacing / 2.0,
+        x = spacing,
         y = y,
         z = z,
       )
     }
+
+    // Top edge
+    translate(
+      y = y - spacing,
+    ) {
+      Cube(
+        x = x,
+        y = spacing,
+        z = z,
+      )
+    }
+
+    // Bottom edge
+    Cube(
+      x = x,
+      y = spacing,
+      z = z,
+    )
   }
 }
 
@@ -125,8 +173,34 @@ fun main() {
       x = 320,
       y = 200,
       z = 10,
-      diameter = 20,
-      spacing = 4,
+      diameter = 45,
+      spacing = 5,
     )
+
+
+    translate(
+      y = -280,
+    ) {
+      HoneycombWall(
+        x = 320,
+        y = 200,
+        z = 10,
+        diameter = 44,
+        spacing = 3,
+      )
+    }
+
+    translate(
+      x = 420,
+    ) {
+      HoneycombWall(
+        x = 320,
+        y = 200,
+        z = 10,
+        diameter = 38,
+        spacing = 3,
+      )
+    }
+
   }
 }
