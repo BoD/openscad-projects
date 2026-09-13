@@ -32,12 +32,17 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.projects.TMP_FOLDER
 import org.jraf.k2o.stdlib.Cube
 import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
 import org.jraf.k2o.stdlib.union
+import org.jraf.k2o.units.Angle.Companion.deg
+import org.jraf.k2o.units.Length
+import org.jraf.k2o.units.Length.Companion.mm
+import org.jraf.k2o.units.Length.Companion.times
 import kotlin.math.sqrt
 
 /**
@@ -57,8 +62,8 @@ import kotlin.math.sqrt
  *   </g>
  *   <g>
  *    <path d="m348.15 202.1h67.544" fill="#00f" stroke="#00f"/>
- *    <text x="381.9978" y="185.51425" fill="#0000ff" font-size="10.667px" stroke="#0000ff" text-align="center" text-anchor="middle" xml:space="preserve"><tspan x="381.9978" y="185.51425" font-family="Helvetica" font-size="10.667px" font-weight="300">Spacing</tspan></text>
- *    <text x="255.71254" y="349.54388" fill="#ff00ff" font-size="10.667px" stroke="#0000ff" text-align="center" text-anchor="middle" xml:space="preserve"><tspan x="255.71254" y="349.54388" fill="#ff00ff" font-family="Helvetica" font-size="10.667px" font-weight="300" stroke="#ff00ff">r/2</tspan></text>
+ *    <text x="381.9978" y="185.51425" fill="#0000ff" font-size="10.667px" stroke="#0000ff" text-anchor="middle" xml:space="preserve"><tspan x="381.9978" y="185.51425" font-family="Helvetica" font-size="10.667px" font-weight="300">Spacing</tspan></text>
+ *    <text x="255.71254" y="349.54388" fill="#ff00ff" font-size="10.667px" stroke="#0000ff" text-anchor="middle" xml:space="preserve"><tspan x="255.71254" y="349.54388" fill="#ff00ff" font-family="Helvetica" font-size="10.667px" font-weight="300" stroke="#ff00ff">r/2</tspan></text>
  *    <path d="m246.04 304.58v67.544" fill="#00f" stroke="#00f"/>
  *   </g>
  *   <path d="m242.94 322.58 0.43788 49.498" fill="#ff0" stroke="#f0f" stroke-width=".49639"/>
@@ -69,18 +74,12 @@ import kotlin.math.sqrt
  */
 @Composable
 fun HoneycombWall(
-  x: Number,
-  y: Number,
-  z: Number,
-  diameter: Number,
-  spacing: Number,
+  x: Length,
+  y: Length,
+  z: Length,
+  diameter: Length,
+  spacing: Length,
 ) {
-  val x = x.toDouble()
-  val y = y.toDouble()
-  val z = z.toDouble()
-  val diameter = diameter.toDouble()
-  val spacing = spacing.toDouble()
-
   val radius = diameter / 2.0
   // Amount to offset hexagons vertically so they fit adjacently together
   val hexagonYOffset = radius / 2.0
@@ -107,7 +106,7 @@ fun HoneycombWall(
         repeat(columnCount + if (row % 2 == 0) 0 else 1) { col ->
           translate(
             x = col * (hexagonWidth + spacing) +
-              (if (row % 2 == 0) 0.0 else -apothem - spacing / 2.0)
+              (if (row % 2 == 0) Length.Zero else -apothem - spacing / 2.0)
               - exceedingX,
             y = row * (diameter - hexagonYOffset + spacing)
               - exceedingY,
@@ -116,7 +115,7 @@ fun HoneycombWall(
               x = apothem,
               y = radius,
             ) {
-              rotate(90) {
+              rotate(90.deg) {
                 Cylinder(
                   height = z,
                   diameter = diameter,
@@ -168,37 +167,37 @@ fun HoneycombWall(
 }
 
 fun main() {
-  openScad(SystemFileSystem.sink(Path("/Users/bod/Tmp/honeycomb-wall.scad")).buffered()) {
+  openScad(SystemFileSystem.sink(Path(TMP_FOLDER, "honeycomb-wall.scad")).buffered()) {
     HoneycombWall(
-      x = 320,
-      y = 200,
-      z = 10,
-      diameter = 45,
-      spacing = 5,
+      x = 320.mm,
+      y = 200.mm,
+      z = 10.mm,
+      diameter = 45.mm,
+      spacing = 5.mm,
     )
 
 
     translate(
-      y = -280,
+      y = -280.mm,
     ) {
       HoneycombWall(
-        x = 320,
-        y = 200,
-        z = 10,
-        diameter = 44,
-        spacing = 3,
+        x = 320.mm,
+        y = 200.mm,
+        z = 10.mm,
+        diameter = 44.mm,
+        spacing = 3.mm,
       )
     }
 
     translate(
-      x = 420,
+      x = 420.mm,
     ) {
       HoneycombWall(
-        x = 320,
-        y = 200,
-        z = 10,
-        diameter = 38,
-        spacing = 3,
+        x = 320.mm,
+        y = 200.mm,
+        z = 10.mm,
+        diameter = 38.mm,
+        spacing = 3.mm,
       )
     }
 

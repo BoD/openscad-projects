@@ -23,9 +23,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("SameParameterValue")
+@file:Suppress("SameParameterValue", "WrapUnaryOperator")
 
-package org.jraf.k2o.projects.mosquitonetpads
+package org.jraf.k2o.projects.doorwedge
 
 import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
@@ -33,78 +33,54 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.projects.TMP_FOLDER
-import org.jraf.k2o.stdlib.Cube
-import org.jraf.k2o.stdlib.Cylinder
+import org.jraf.k2o.shapes.LurezLogo
+import org.jraf.k2o.stdlib.Color
+import org.jraf.k2o.stdlib.Polygon
+import org.jraf.k2o.stdlib.color
 import org.jraf.k2o.stdlib.difference
-import org.jraf.k2o.stdlib.hull
+import org.jraf.k2o.stdlib.linearExtrude
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
-import org.jraf.k2o.stdlib.union
 import org.jraf.k2o.units.Angle.Companion.deg
-import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.cm
 import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
-private fun MosquitoNetPads() {
-  val diameterLarge = 13.1.mm
-  val diameterSmall = 8.8.mm
+private fun DoorWedge() {
+  val lengthX = 8.cm
+  val bigLengthY = 1.cm
+  val smallLengthX = 2.mm
+  val lengthZ = 3.cm
 
-  val thickness = 1.4.mm
-  val height = 1.cm
-  val baseDiameter = 2.cm
+  difference {
+    linearExtrude(height = lengthZ) {
+      Polygon(
+        0.mm to 0.mm,
+        lengthX to 0.mm,
+        lengthX to smallLengthX,
+        0.mm to bigLengthY,
+      )
+    }
 
-  // Large pad
-  MosquitoNetPad(
-    height = height,
-    thickness = thickness,
-    baseDiameter = baseDiameter,
-    diameter = diameterLarge,
-  )
-
-  // Small pad
-  translate(
-    x = baseDiameter * 1.2,
-  ) {
-    MosquitoNetPad(
-      height = height,
-      thickness = thickness,
-      baseDiameter = baseDiameter,
-      diameter = diameterSmall,
-    )
-  }
-}
-
-@Composable
-private fun MosquitoNetPad(
-  height: Length,
-  thickness: Length,
-  baseDiameter: Length,
-  diameter: Length,
-) {
-  union {
-    difference {
-      Cylinder(height = height + thickness, diameter = diameter + thickness * 2)
-      Cylinder(height = height + thickness, diameter = diameter)
-      hull {
-        Cube(x = diameter / 2 + thickness * 2, y = .1.mm, z = height + thickness)
-        rotate(z = 45.deg) {
-          Cube(x = diameter / 2 + thickness * 2, y = .1.mm, z = height + thickness)
+    val logoWidth = lengthZ * 2 * 0.8
+    val logoHeight = logoWidth / 2 // 2:1 aspect ratio
+    val logoThickness = 2.mm
+    translate(y = bigLengthY, z = (lengthZ - logoHeight) / 2 + logoHeight / 2) {
+      rotate(x = -90.deg, z = -5.7.deg) {
+        translate(x = (lengthX - logoWidth) / 2 + logoWidth / 2, z = -logoThickness) {
+          color(Color.Red) {
+            LurezLogo(width = logoWidth, thickness = logoThickness)
+          }
         }
       }
     }
-
-    // Base
-    Cylinder(height = thickness, diameter = baseDiameter)
   }
 }
 
 fun main() {
   openScad(
-    SystemFileSystem.sink(Path(TMP_FOLDER, "mosquito-net-pads.scad")).buffered(),
-    fa = .1,
-    fs = .1,
+    SystemFileSystem.sink(Path(TMP_FOLDER, "door-wedge.scad")).buffered(),
   ) {
-    MosquitoNetPads()
+    DoorWedge()
   }
 }

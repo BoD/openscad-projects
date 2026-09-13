@@ -23,7 +23,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("SameParameterValue")
+@file:Suppress("SameParameterValue", "WrapUnaryOperator", "UnnecessaryVariable")
 
 package org.jraf.k2o.projects.plantpotsuspender
 
@@ -32,6 +32,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.projects.TMP_FOLDER
 import org.jraf.k2o.shapes.ExtrudedRoundedSquare
 import org.jraf.k2o.shapes.HoneycombWall
 import org.jraf.k2o.stdlib.Comment
@@ -40,31 +41,46 @@ import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.Polygon
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.linearExtrude
+import org.jraf.k2o.stdlib.offset
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
-import org.jraf.k2o.util.cm
-import org.jraf.k2o.util.mm
+import org.jraf.k2o.units.Angle.Companion.deg
+import org.jraf.k2o.units.Length
+import org.jraf.k2o.units.Length.Companion.cm
+import org.jraf.k2o.units.Length.Companion.mm
+import org.jraf.k2o.units.Length.Companion.times
 
 @Composable
-private fun Main() {
+private fun PlantPotSuspender() {
   val rampLengthX = 40.3.mm
   val rampLengthZ = 20.7.mm
 
-  val hookThickness = 3.2.mm
+  val thickness = 3.2.mm
+
+  val hookThickness = thickness
   val hookInteriorShortLengthZ = rampLengthZ
   val hookInteriorLongLengthZ = 15.cm
   val hookInteriorLengthX = rampLengthX
   val hookLengthY = 1.cm
 
-  val trayThickness = 3.2.mm
-  val trayLengthX = 15.cm
-  val trayLengthY = 15.cm
+  val potThickness = thickness
+  val potDiameterBottomInterior = 8.3.cm
+  val potDiameterBottomExterior = potDiameterBottomInterior + 2 * potThickness
+  val potDiameterTopInterior = 9.cm
+  val potDiameterTopExterior = potDiameterTopInterior + 2 * potThickness
+  val potHeight = 3.cm
 
-  val reinforcementThickness = hookThickness
+  val holeDiameter = potDiameterTopExterior
+
+  val backPadding = .8.cm
+
+  val trayThickness = thickness
+  val trayLengthX = potDiameterTopExterior / 2 + backPadding
+  val trayLengthY = potDiameterTopExterior
+
+  val reinforcementThickness = thickness
   val horizontalReinforcementLengthZ = 1.cm
 
-  val holeDiameter = 14.cm
-  val holeBorder = 4.mm
 
   Comment("Tray", false)
   difference {
@@ -72,14 +88,14 @@ private fun Main() {
       x = trayLengthX,
       y = trayLengthY,
       z = trayThickness,
-      diameter = 1.4.cm,
-      spacing = 4.mm,
+      diameter = 1.6.cm,
+      spacing = thickness,
     )
 
     // Hole
     translate(
-      trayLengthX / 2,
-      trayLengthY / 2,
+      x = holeDiameter / 2 + backPadding,
+      y = holeDiameter / 2,
     ) {
       Cylinder(
         diameter = holeDiameter,
@@ -88,21 +104,18 @@ private fun Main() {
     }
   }
 
-  // Hole border
+  Comment("Pot")
   translate(
-    trayLengthX / 2,
-    trayLengthY / 2,
+    x = potDiameterTopExterior / 2 + backPadding,
+    y = potDiameterTopExterior / 2,
+    z = -potHeight + potThickness,
   ) {
-    difference {
-      Cylinder(
-        diameter = holeDiameter + holeBorder * 2,
-        height = trayThickness,
-      )
-      Cylinder(
-        diameter = holeDiameter,
-        height = trayThickness,
-      )
-    }
+    Pot(
+      potDiameterBottom = potDiameterBottomExterior,
+      potDiameterTop = potDiameterTopExterior,
+      potHeight = potHeight,
+      potThickness = potThickness,
+    )
   }
 
   Comment("Left hook")
@@ -165,33 +178,78 @@ private fun Main() {
 }
 
 @Composable
-private fun Reinforcement(
-  reinforcementThickness: Double,
-  trayLengthX: Double,
-  hookInteriorLongLengthZ: Double,
+private fun Pot(
+  potDiameterBottom: Length,
+  potDiameterTop: Length,
+  potHeight: Length,
+  potThickness: Length,
 ) {
-  translate(
-    y = reinforcementThickness,
-  ) {
-    rotate(x = 90) {
-      linearExtrude(height = reinforcementThickness) {
-        Polygon(
-          0 to 0,
-          2 * (trayLengthX / 3) to 0,
-          0 to hookInteriorLongLengthZ / 3,
-        )
-      }
+  difference {
+    Cylinder(
+      diameter = potDiameterBottom,
+      topDiameter = potDiameterTop,
+      height = potHeight,
+    )
+
+    difference {
+      Cylinder(
+        diameter = potDiameterBottom - potThickness * 2,
+        topDiameter = potDiameterTop - potThickness * 2,
+        height = potHeight,
+      )
+      Cylinder(
+        diameter = potDiameterBottom - potThickness * 2,
+        height = potThickness,
+      )
     }
   }
 }
 
 @Composable
+private fun Reinforcement(
+  reinforcementThickness: Length,
+  trayLengthX: Length,
+  hookInteriorLongLengthZ: Length,
+) {
+  translate(
+    y = reinforcementThickness,
+  ) {
+    rotate(x = 90.deg) {
+      linearExtrude(height = reinforcementThickness) {
+        difference {
+          Polygon(
+            0.mm to 0.mm,
+            trayLengthX to 0.mm,
+            0.mm to hookInteriorLongLengthZ / 3,
+          )
+          offset(-reinforcementThickness) {
+            Polygon(
+              0.mm to 0.mm,
+              trayLengthX to 0.mm,
+              0.mm to hookInteriorLongLengthZ / 3,
+            )
+          }
+        }
+      }
+    }
+  }
+
+  translate(x = reinforcementThickness) {
+    Cube(
+      x = reinforcementThickness,
+      y = reinforcementThickness,
+      z = hookInteriorLongLengthZ + reinforcementThickness,
+    )
+  }
+}
+
+@Composable
 private fun Hook(
-  hookThickness: Double,
-  hookInteriorShortLengthZ: Double,
-  hookInteriorLongLengthZ: Double,
-  hookInteriorLengthX: Double,
-  hookLengthY: Double,
+  hookThickness: Length,
+  hookInteriorShortLengthZ: Length,
+  hookInteriorLongLengthZ: Length,
+  hookInteriorLengthX: Length,
+  hookLengthY: Length,
 ) {
   // Top part
   translate(
@@ -209,7 +267,7 @@ private fun Hook(
     x = hookThickness,
     z = hookInteriorLongLengthZ - hookInteriorShortLengthZ,
   ) {
-    rotate(y = -90) {
+    rotate(y = -90.deg) {
       ExtrudedRoundedSquare(
         x = hookInteriorShortLengthZ,
         y = hookLengthY,
@@ -234,10 +292,10 @@ private fun Hook(
 
 fun main() {
   openScad(
-    SystemFileSystem.sink(Path("/Users/bod/Tmp/plant-pot-suspender.scad")).buffered(),
+    SystemFileSystem.sink(Path(TMP_FOLDER, "plant-pot-suspender.scad")).buffered(),
     fa = .2,
     fs = .2,
   ) {
-    Main()
+    PlantPotSuspender()
   }
 }

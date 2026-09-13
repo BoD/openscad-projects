@@ -23,7 +23,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.k2o.shapes
+package org.jraf.k2o.projects.plantholder
 
 import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
@@ -31,57 +31,60 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.projects.TMP_FOLDER
-import org.jraf.k2o.stdlib.Sphere
+import org.jraf.k2o.stdlib.Cylinder
+import org.jraf.k2o.stdlib.Polygon
+import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.linearExtrude
-import org.jraf.k2o.stdlib.minkowski
+import org.jraf.k2o.stdlib.mirror
 import org.jraf.k2o.stdlib.translate
 import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
-fun RoundedExtrudedRoundedSquare(
-  x: Length,
-  y: Length,
-  z: Length,
-  topLeftRadius: Length = Length.Zero,
-  topRightRadius: Length = Length.Zero,
-  bottomRightRadius: Length = Length.Zero,
-  bottomLeftRadius: Length = Length.Zero,
-  roundingRadius: Length,
+private fun Half(
+  width: Length,
+  height: Length,
 ) {
-  translate(roundingRadius, roundingRadius, roundingRadius) {
-    minkowski {
-      linearExtrude((z - roundingRadius * 2).coerceAtLeast(Length.Smallest)) {
-        RoundedSquare(
-          x = x - roundingRadius * 2,
-          y = y - roundingRadius * 2,
-          topLeftRadius = topLeftRadius,
-          topRightRadius = topRightRadius,
-          bottomRightRadius = bottomRightRadius,
-          bottomLeftRadius = bottomLeftRadius,
+  Polygon(
+    width / 2 to (height - 10.mm),
+    0.mm to height,
+    0.mm to 10.mm,
+    width / 2 to 0.mm,
+  )
+}
+
+@Composable
+private fun PlantHolder() {
+  val width = 20.mm
+  val height = 60.mm
+  val thickness = 2.mm
+
+  difference {
+    linearExtrude(thickness) {
+      Half(
+        width = width,
+        height = height,
+      )
+      mirror(1, 0, 0) {
+        Half(
+          width = width,
+          height = height,
         )
       }
+    }
 
-      Sphere(roundingRadius)
+    translate(y = 21.mm) {
+      Cylinder(diameter = 15.mm, height = thickness)
+    }
+
+    translate(y = 40.mm) {
+      Cylinder(diameter = 15.mm, height = thickness)
     }
   }
 }
 
 fun main() {
-  openScad(
-    SystemFileSystem.sink(Path(TMP_FOLDER, "rounded-extruded-rounded-square.scad")).buffered(),
-    fa = 1.0,
-    fs = 1.0,
-  ) {
-    RoundedExtrudedRoundedSquare(
-      x = 320.mm,
-      y = 200.mm,
-      z = 100.mm,
-      topLeftRadius = 0.mm,
-      topRightRadius = 50.mm,
-      bottomRightRadius = 50.mm,
-      bottomLeftRadius = 0.mm,
-      roundingRadius = 10.mm,
-    )
+  openScad(SystemFileSystem.sink(Path(TMP_FOLDER, "plant-holder.scad")).buffered()) {
+    PlantHolder()
   }
 }

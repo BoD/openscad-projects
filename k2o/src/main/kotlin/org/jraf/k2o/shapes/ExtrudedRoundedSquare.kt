@@ -30,15 +30,18 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.projects.TMP_FOLDER
 import org.jraf.k2o.stdlib.linearExtrude
 import org.jraf.k2o.stdlib.translate
+import org.jraf.k2o.units.Length
+import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
 fun ExtrudedRoundedSquare(
-  x: Number,
-  y: Number,
-  z: Number,
-  radius: Number = 0,
+  x: Length,
+  y: Length,
+  z: Length,
+  radius: Length = Length.Zero,
 ) {
   ExtrudedRoundedSquare(
     x = x,
@@ -53,13 +56,13 @@ fun ExtrudedRoundedSquare(
 
 @Composable
 fun ExtrudedRoundedSquare(
-  x: Number,
-  y: Number,
-  z: Number,
-  topLeftRadius: Number = 0,
-  topRightRadius: Number = 0,
-  bottomRightRadius: Number = 0,
-  bottomLeftRadius: Number = 0,
+  x: Length,
+  y: Length,
+  z: Length,
+  topLeftRadius: Length = Length.Zero,
+  topRightRadius: Length = Length.Zero,
+  bottomRightRadius: Length = Length.Zero,
+  bottomLeftRadius: Length = Length.Zero,
 ) {
   linearExtrude(z) {
     RoundedSquare(
@@ -74,59 +77,59 @@ fun ExtrudedRoundedSquare(
 }
 
 fun main() {
-  openScad(SystemFileSystem.sink(Path("/Users/bod/Tmp/extruded-rounded-square.scad")).buffered()) {
+  openScad(SystemFileSystem.sink(Path(TMP_FOLDER, "extruded-rounded-square.scad")).buffered()) {
     ExtrudedRoundedSquare(
-      x = 320,
-      y = 200,
-      z = 20,
-      topLeftRadius = 30,
-      topRightRadius = 50,
-      bottomRightRadius = 70,
-      bottomLeftRadius = 80,
+      x = 320.mm,
+      y = 200.mm,
+      z = 20.mm,
+      topLeftRadius = 30.mm,
+      topRightRadius = 50.mm,
+      bottomRightRadius = 70.mm,
+      bottomLeftRadius = 80.mm,
     )
 
-    translate(x = 400) {
+    translate(x = 400.mm) {
       ExtrudedRoundedSquare(
-        x = 320,
-        y = 200,
-        z = 20,
-        topLeftRadius = 0,
-        topRightRadius = 0,
-        bottomRightRadius = 0,
-        bottomLeftRadius = 0,
+        x = 320.mm,
+        y = 200.mm,
+        z = 20.mm,
+        topLeftRadius = 0.mm,
+        topRightRadius = 0.mm,
+        bottomRightRadius = 0.mm,
+        bottomLeftRadius = 0.mm,
       )
     }
 
-    translate(x = 800) {
+    translate(x = 800.mm) {
       ExtrudedRoundedSquare(
-        x = 320,
-        y = 200,
-        z = 20,
-        topLeftRadius = 0,
-        topRightRadius = 50,
-        bottomRightRadius = 70,
-        bottomLeftRadius = 80,
+        x = 320.mm,
+        y = 200.mm,
+        z = 20.mm,
+        topLeftRadius = 0.mm,
+        topRightRadius = 50.mm,
+        bottomRightRadius = 70.mm,
+        bottomLeftRadius = 80.mm,
       )
     }
 
-    translate(x = 1200) {
+    translate(x = 1200.mm) {
       ExtrudedRoundedSquare(
-        x = 320,
-        y = 200,
-        z = 20,
-        topLeftRadius = 30,
-        topRightRadius = 0,
-        bottomRightRadius = 0,
-        bottomLeftRadius = 80,
+        x = 320.mm,
+        y = 200.mm,
+        z = 20.mm,
+        topLeftRadius = 30.mm,
+        topRightRadius = 0.mm,
+        bottomRightRadius = 0.mm,
+        bottomLeftRadius = 80.mm,
       )
     }
 
-    translate(x = 1600) {
+    translate(x = 1600.mm) {
       ExtrudedRoundedSquare(
-        x = 320,
-        y = 200,
-        z = 20,
-        80,
+        x = 320.mm,
+        y = 200.mm,
+        z = 20.mm,
+        80.mm,
       )
     }
   }

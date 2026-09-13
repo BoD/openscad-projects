@@ -7,7 +7,7 @@
  *                              /___/
  * repository.
  *
- * Copyright (C) 2026-present Benoit 'BoD' Lubek (BoD@JRAF.org)
+ * Copyright (C) 2025-present Benoit 'BoD' Lubek (BoD@JRAF.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("SameParameterValue")
-
-package org.jraf.k2o.projects.mosquitonetpads
+package org.jraf.k2o.projects.pipeextension
 
 import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
@@ -36,75 +34,53 @@ import org.jraf.k2o.projects.TMP_FOLDER
 import org.jraf.k2o.stdlib.Cube
 import org.jraf.k2o.stdlib.Cylinder
 import org.jraf.k2o.stdlib.difference
-import org.jraf.k2o.stdlib.hull
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
-import org.jraf.k2o.stdlib.union
 import org.jraf.k2o.units.Angle.Companion.deg
 import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.cm
 import org.jraf.k2o.units.Length.Companion.mm
+import kotlin.math.sqrt
 
 @Composable
-private fun MosquitoNetPads() {
-  val diameterLarge = 13.1.mm
-  val diameterSmall = 8.8.mm
-
-  val thickness = 1.4.mm
-  val height = 1.cm
-  val baseDiameter = 2.cm
-
-  // Large pad
-  MosquitoNetPad(
-    height = height,
-    thickness = thickness,
-    baseDiameter = baseDiameter,
-    diameter = diameterLarge,
-  )
-
-  // Small pad
-  translate(
-    x = baseDiameter * 1.2,
-  ) {
-    MosquitoNetPad(
-      height = height,
-      thickness = thickness,
-      baseDiameter = baseDiameter,
-      diameter = diameterSmall,
-    )
-  }
-}
-
-@Composable
-private fun MosquitoNetPad(
-  height: Length,
+private fun PipeExtension(
+  innerDiameter: Length,
+  length: Length,
   thickness: Length,
-  baseDiameter: Length,
-  diameter: Length,
 ) {
-  union {
-    difference {
-      Cylinder(height = height + thickness, diameter = diameter + thickness * 2)
-      Cylinder(height = height + thickness, diameter = diameter)
-      hull {
-        Cube(x = diameter / 2 + thickness * 2, y = .1.mm, z = height + thickness)
-        rotate(z = 45.deg) {
-          Cube(x = diameter / 2 + thickness * 2, y = .1.mm, z = height + thickness)
-        }
+  difference {
+    // Outer tube
+    Cylinder(height = length, radius = innerDiameter / 2 + thickness)
+
+    // Inner tube
+    Cylinder(height = length, radius = innerDiameter / 2)
+
+    // Slant
+    val cubeSide = length
+    translate(x = -cubeSide / sqrt(2.0) + innerDiameter / 2 + thickness, z = cubeSide / sqrt(2.0) + (length - cubeSide / sqrt(2.0))) {
+      rotate(y = 45.deg) {
+        Cube(cubeSide, center = true)
       }
     }
 
-    // Base
-    Cylinder(height = thickness, diameter = baseDiameter)
+    // Slit
+    val slitWidth = thickness * 5
+    translate(-innerDiameter, -slitWidth / 2) {
+      Cube(innerDiameter, slitWidth, length)
+    }
   }
 }
 
 fun main() {
-  openScad(
-    SystemFileSystem.sink(Path(TMP_FOLDER, "mosquito-net-pads.scad")).buffered(),
-    fa = .1,
-    fs = .1,
-  ) {
-    MosquitoNetPads()
+  openScad(SystemFileSystem.sink(Path(TMP_FOLDER, "pipe-extension.scad")).buffered()) {
+    val innerDiameter = 37.mm
+    val thickness = 2.mm
+    val length = 20.cm
+
+    PipeExtension(
+      innerDiameter = innerDiameter,
+      length = length,
+      thickness = thickness,
+    )
   }
 }

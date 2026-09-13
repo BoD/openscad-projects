@@ -32,17 +32,20 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.projects.TMP_FOLDER
 import org.jraf.k2o.stdlib.Circle
 import org.jraf.k2o.stdlib.Square
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.hull
 import org.jraf.k2o.stdlib.translate
+import org.jraf.k2o.units.Length
+import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
 fun RoundedSquare(
-  x: Number,
-  y: Number,
-  radius: Number = 0,
+  x: Length,
+  y: Length,
+  radius: Length = Length.Zero,
 ) {
   RoundedSquare(
     x = x,
@@ -56,27 +59,20 @@ fun RoundedSquare(
 
 @Composable
 fun RoundedSquare(
-  x: Number,
-  y: Number,
-  topLeftRadius: Number = 0,
-  topRightRadius: Number = 0,
-  bottomRightRadius: Number = 0,
-  bottomLeftRadius: Number = 0,
+  x: Length,
+  y: Length,
+  topLeftRadius: Length = Length.Zero,
+  topRightRadius: Length = Length.Zero,
+  bottomRightRadius: Length = Length.Zero,
+  bottomLeftRadius: Length = Length.Zero,
 ) {
-  val x = x.toDouble()
-  val y = y.toDouble()
-  val topLeftRadius = topLeftRadius.toDouble()
-  val topRightRadius = topRightRadius.toDouble()
-  val bottomRightRadius = bottomRightRadius.toDouble()
-  val bottomLeftRadius = bottomLeftRadius.toDouble()
-
   hull {
-    if (topLeftRadius > 0) {
+    if (topLeftRadius > Length.Zero) {
       translate(x = topLeftRadius, y = y - topLeftRadius) {
         // Top left quarter circle
         difference {
           Circle(radius = topLeftRadius)
-          translate(x = 0, y = -topLeftRadius) {
+          translate(y = -topLeftRadius) {
             Square(width = topLeftRadius, height = topLeftRadius * 2)
           }
           translate(x = -topLeftRadius, y = -topLeftRadius) {
@@ -85,11 +81,11 @@ fun RoundedSquare(
         }
       }
     } else {
-      translate(x = 0, y = y - SMALLEST_LENGTH) {
-        Square(SMALLEST_LENGTH)
+      translate(y = y - Length.Smallest) {
+        Square(Length.Smallest)
       }
     }
-    if (topRightRadius > 0) {
+    if (topRightRadius > Length.Zero) {
       translate(x = x - topRightRadius, y = y - topRightRadius) {
         // Top right quarter circle
         difference {
@@ -97,18 +93,18 @@ fun RoundedSquare(
           translate(x = -topRightRadius, y = -topRightRadius) {
             Square(width = topRightRadius, height = topRightRadius * 2)
           }
-          translate(x = 0, y = -topRightRadius) {
+          translate(y = -topRightRadius) {
             Square(width = topRightRadius, height = topRightRadius)
           }
         }
       }
     } else {
-      translate(x = x - SMALLEST_LENGTH, y = y - SMALLEST_LENGTH) {
-        Square(SMALLEST_LENGTH)
+      translate(x = x - Length.Smallest, y = y - Length.Smallest) {
+        Square(Length.Smallest)
       }
     }
 
-    if (bottomRightRadius > 0) {
+    if (bottomRightRadius > Length.Zero) {
       translate(x = x - bottomRightRadius, y = bottomRightRadius) {
         // Bottom right quarter circle
         difference {
@@ -116,85 +112,83 @@ fun RoundedSquare(
           translate(x = -bottomRightRadius, y = -bottomRightRadius) {
             Square(width = bottomRightRadius, height = bottomRightRadius * 2)
           }
-          translate(x = 0, y = 0) {
-            Square(width = bottomRightRadius, height = bottomRightRadius)
-          }
+          Square(width = bottomRightRadius, height = bottomRightRadius)
         }
       }
     } else {
-      translate(x = x - SMALLEST_LENGTH, y = 0) {
-        Square(SMALLEST_LENGTH)
+      translate(x = x - Length.Smallest) {
+        Square(Length.Smallest)
       }
     }
 
-    if (bottomLeftRadius > 0) {
+    if (bottomLeftRadius > Length.Zero) {
       translate(x = bottomLeftRadius, y = bottomLeftRadius) {
         // Bottom left quarter circle
         difference {
           Circle(radius = bottomLeftRadius)
-          translate(x = 0, y = -bottomLeftRadius) {
+          translate(y = -bottomLeftRadius) {
             Square(width = bottomLeftRadius, height = bottomLeftRadius * 2)
           }
-          translate(x = -bottomLeftRadius, y = 0) {
+          translate(x = -bottomLeftRadius) {
             Square(width = bottomLeftRadius, height = bottomLeftRadius)
           }
         }
       }
     } else {
-      Square(SMALLEST_LENGTH)
+      Square(Length.Smallest)
     }
   }
 }
 
 fun main() {
-  openScad(SystemFileSystem.sink(Path("/Users/bod/Tmp/rounded-square.scad")).buffered()) {
+  openScad(SystemFileSystem.sink(Path(TMP_FOLDER, "rounded-square.scad")).buffered()) {
     RoundedSquare(
-      x = 320,
-      y = 200,
-      topLeftRadius = 30,
-      topRightRadius = 50,
-      bottomRightRadius = 70,
-      bottomLeftRadius = 80,
+      x = 320.mm,
+      y = 200.mm,
+      topLeftRadius = 30.mm,
+      topRightRadius = 50.mm,
+      bottomRightRadius = 70.mm,
+      bottomLeftRadius = 80.mm,
     )
 
-    translate(x = 400) {
+    translate(x = 400.mm) {
       RoundedSquare(
-        x = 320,
-        y = 200,
-        topLeftRadius = 0,
-        topRightRadius = 0,
-        bottomRightRadius = 0,
-        bottomLeftRadius = 0,
+        x = 320.mm,
+        y = 200.mm,
+        topLeftRadius = 0.mm,
+        topRightRadius = 0.mm,
+        bottomRightRadius = 0.mm,
+        bottomLeftRadius = 0.mm,
       )
     }
 
-    translate(x = 800) {
+    translate(x = 800.mm) {
       RoundedSquare(
-        x = 320,
-        y = 200,
-        topLeftRadius = 0,
-        topRightRadius = 50,
-        bottomRightRadius = 70,
-        bottomLeftRadius = 80,
+        x = 320.mm,
+        y = 200.mm,
+        topLeftRadius = 0.mm,
+        topRightRadius = 50.mm,
+        bottomRightRadius = 70.mm,
+        bottomLeftRadius = 80.mm,
       )
     }
 
-    translate(x = 1200) {
+    translate(x = 1200.mm) {
       RoundedSquare(
-        x = 320,
-        y = 200,
-        topLeftRadius = 30,
-        topRightRadius = 0,
-        bottomRightRadius = 0,
-        bottomLeftRadius = 80,
+        x = 320.mm,
+        y = 200.mm,
+        topLeftRadius = 30.mm,
+        topRightRadius = 0.mm,
+        bottomRightRadius = 0.mm,
+        bottomLeftRadius = 80.mm,
       )
     }
 
-    translate(x = 1600) {
+    translate(x = 1600.mm) {
       RoundedSquare(
-        x = 320,
-        y = 200,
-        80,
+        x = 320.mm,
+        y = 200.mm,
+        80.mm,
       )
     }
   }

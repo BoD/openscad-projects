@@ -23,7 +23,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.k2o.shapes
+@file:Suppress("SameParameterValue")
+
+package org.jraf.k2o.projects.walkolution2matholder
 
 import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
@@ -31,57 +33,48 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.projects.TMP_FOLDER
-import org.jraf.k2o.stdlib.Sphere
-import org.jraf.k2o.stdlib.linearExtrude
-import org.jraf.k2o.stdlib.minkowski
+import org.jraf.k2o.shapes.RoundedExtrudedRoundedSquare
 import org.jraf.k2o.stdlib.translate
 import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
-fun RoundedExtrudedRoundedSquare(
-  x: Length,
-  y: Length,
-  z: Length,
-  topLeftRadius: Length = Length.Zero,
-  topRightRadius: Length = Length.Zero,
-  bottomRightRadius: Length = Length.Zero,
-  bottomLeftRadius: Length = Length.Zero,
-  roundingRadius: Length,
-) {
-  translate(roundingRadius, roundingRadius, roundingRadius) {
-    minkowski {
-      linearExtrude((z - roundingRadius * 2).coerceAtLeast(Length.Smallest)) {
-        RoundedSquare(
-          x = x - roundingRadius * 2,
-          y = y - roundingRadius * 2,
-          topLeftRadius = topLeftRadius,
-          topRightRadius = topRightRadius,
-          bottomRightRadius = bottomRightRadius,
-          bottomLeftRadius = bottomLeftRadius,
-        )
-      }
+private fun Walkolution2MatHolder() {
+  val lengthZ = 8.5.mm
+  val lengthX = 15.mm
+  val lengthY = 120.mm
+  val thickness = 6.mm
 
-      Sphere(roundingRadius)
-    }
+  horizontalPart(lengthX = lengthX, thickness = thickness, lengthY = lengthY)
+  translate(z = lengthZ + thickness) {
+    horizontalPart(lengthX = lengthX, thickness = thickness, lengthY = lengthY)
   }
+  RoundedExtrudedRoundedSquare(
+    x = thickness,
+    y = lengthY,
+    z = lengthZ + thickness * 2,
+    roundingRadius = thickness / 2,
+  )
+}
+
+@Composable
+private fun horizontalPart(lengthX: Length, thickness: Length, lengthY: Length) {
+  RoundedExtrudedRoundedSquare(
+    x = lengthX + thickness,
+    y = lengthY,
+    z = thickness,
+    topRightRadius = lengthX,
+    bottomRightRadius = lengthX,
+    roundingRadius = thickness / 2,
+  )
 }
 
 fun main() {
   openScad(
-    SystemFileSystem.sink(Path(TMP_FOLDER, "rounded-extruded-rounded-square.scad")).buffered(),
-    fa = 1.0,
-    fs = 1.0,
+    SystemFileSystem.sink(Path(TMP_FOLDER, "walkolution2-mat-holder.scad")).buffered(),
+    fa = .25,
+    fs = .25,
   ) {
-    RoundedExtrudedRoundedSquare(
-      x = 320.mm,
-      y = 200.mm,
-      z = 100.mm,
-      topLeftRadius = 0.mm,
-      topRightRadius = 50.mm,
-      bottomRightRadius = 50.mm,
-      bottomLeftRadius = 0.mm,
-      roundingRadius = 10.mm,
-    )
+    Walkolution2MatHolder()
   }
 }

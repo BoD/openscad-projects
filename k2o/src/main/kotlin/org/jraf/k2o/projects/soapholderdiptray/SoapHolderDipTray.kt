@@ -23,7 +23,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.k2o.shapes
+@file:Suppress("SameParameterValue")
+
+package org.jraf.k2o.projects.soapholderdiptray
 
 import androidx.compose.runtime.Composable
 import kotlinx.io.buffered
@@ -31,48 +33,66 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.projects.TMP_FOLDER
+import org.jraf.k2o.shapes.ExtrudedRoundedSquare
+import org.jraf.k2o.shapes.LzLogo
 import org.jraf.k2o.stdlib.Cube
-import org.jraf.k2o.stdlib.Cylinder
-import org.jraf.k2o.stdlib.Sphere
 import org.jraf.k2o.stdlib.difference
-import org.jraf.k2o.stdlib.minkowski
 import org.jraf.k2o.stdlib.translate
-import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
-fun RoundedHalfCylinder(
-  height: Length,
-  radius: Length,
-  thickness: Length,
-) {
-  translate(
-    z = thickness / 2,
-  ) {
-    minkowski {
-      difference {
-        Cylinder(height = height - thickness, radius = radius - thickness / 2)
-        Cylinder(height = height - thickness, radius = radius - thickness / 2 - Length.Smallest)
-        // Cut half
-        translate(x = -radius, y = -radius) {
-          Cube(x = radius * 2, y = radius, z = height)
-        }
-      }
-      Sphere(thickness / 2)
+private fun SoapHolderDipTray() {
+  val soapHolderLengthX = 131.4.mm
+  val soapHolderLengthY = 83.4.mm
+  val soapHolderLengthZ = 24.4.mm
+
+  val wallThickness = 1.mm
+  val wallHeight = soapHolderLengthZ / 4
+
+  val tolerance = 1.mm
+
+  val lengthX = soapHolderLengthX + wallThickness * 2 + tolerance
+  val lengthY = soapHolderLengthY + wallThickness * 2 + tolerance
+  difference {
+    ExtrudedRoundedSquare(
+      x = lengthX,
+      y = lengthY,
+      z = wallHeight + wallThickness,
+      radius = 1.mm,
+    )
+
+    translate(
+      x = wallThickness,
+      y = wallThickness,
+      z = wallThickness,
+    ) {
+      Cube(
+        x = soapHolderLengthX + tolerance,
+        y = soapHolderLengthY + tolerance,
+        z = wallHeight,
+      )
+    }
+
+    // Lurez logo
+    translate(
+      x = lengthX / 4 + lengthX / 2 - (lengthX / 2) / 2,
+      y = lengthY / 4 + lengthY / 2 - (lengthY / 2) / 2,
+      z = wallThickness - wallThickness / 3,
+    ) {
+      LzLogo(
+        width = lengthX / 2,
+        thickness = 1.mm,
+      )
     }
   }
 }
 
 fun main() {
   openScad(
-    SystemFileSystem.sink(Path(TMP_FOLDER, "rounded-half-cylinder.scad")).buffered(),
-    fa = 1.0,
-    fs = 1.0,
+    SystemFileSystem.sink(Path(TMP_FOLDER, "soap-holder-dip-tray.scad")).buffered(),
+    fa = .1,
+    fs = .1,
   ) {
-    RoundedHalfCylinder(
-      height = 100.mm,
-      radius = 50.mm,
-      thickness = 5.mm,
-    )
+    SoapHolderDipTray()
   }
 }
