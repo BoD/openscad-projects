@@ -37,6 +37,7 @@ import org.jraf.k2o.stdlib.Circle
 import org.jraf.k2o.stdlib.Square
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.hull
+import org.jraf.k2o.stdlib.offset
 import org.jraf.k2o.stdlib.translate
 import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.mm
@@ -46,6 +47,7 @@ fun RoundedSquare(
   x: Length,
   y: Length,
   radius: Length = Length.Zero,
+  offset: Length = Length.Zero,
 ) {
   RoundedSquare(
     x = x,
@@ -54,6 +56,7 @@ fun RoundedSquare(
     topRightRadius = radius,
     bottomRightRadius = radius,
     bottomLeftRadius = radius,
+    offset = offset,
   )
 }
 
@@ -65,6 +68,27 @@ fun RoundedSquare(
   topRightRadius: Length = Length.Zero,
   bottomRightRadius: Length = Length.Zero,
   bottomLeftRadius: Length = Length.Zero,
+  offset: Length = Length.Zero,
+) {
+  if (offset != Length.Zero) {
+    translate(x = offset, y = offset) {
+      offset(radius = offset) {
+        RoundedSquare(topLeftRadius, y, topRightRadius, x, bottomRightRadius, bottomLeftRadius)
+      }
+    }
+  } else {
+    RoundedSquare(topLeftRadius, y, topRightRadius, x, bottomRightRadius, bottomLeftRadius)
+  }
+}
+
+@Composable
+private fun RoundedSquare(
+  topLeftRadius: Length,
+  y: Length,
+  topRightRadius: Length,
+  x: Length,
+  bottomRightRadius: Length,
+  bottomLeftRadius: Length,
 ) {
   hull {
     if (topLeftRadius > Length.Zero) {

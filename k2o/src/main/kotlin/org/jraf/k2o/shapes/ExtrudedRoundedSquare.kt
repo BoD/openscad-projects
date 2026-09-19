@@ -42,6 +42,7 @@ fun ExtrudedRoundedSquare(
   y: Length,
   z: Length,
   radius: Length = Length.Zero,
+  offset: Length = Length.Zero,
 ) {
   ExtrudedRoundedSquare(
     x = x,
@@ -51,6 +52,7 @@ fun ExtrudedRoundedSquare(
     topRightRadius = radius,
     bottomRightRadius = radius,
     bottomLeftRadius = radius,
+    offset = offset,
   )
 }
 
@@ -63,6 +65,7 @@ fun ExtrudedRoundedSquare(
   topRightRadius: Length = Length.Zero,
   bottomRightRadius: Length = Length.Zero,
   bottomLeftRadius: Length = Length.Zero,
+  offset: Length = Length.Zero,
 ) {
   linearExtrude(z) {
     RoundedSquare(
@@ -72,6 +75,7 @@ fun ExtrudedRoundedSquare(
       topRightRadius = topRightRadius,
       bottomRightRadius = bottomRightRadius,
       bottomLeftRadius = bottomLeftRadius,
+      offset = offset,
     )
   }
 }

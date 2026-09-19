@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.4.20"
 compose = "1.12.0"
-k2o = "1.4.0-SNAPSHOT"
+k2o = "1.4.1-SNAPSHOT"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

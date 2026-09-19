@@ -33,44 +33,69 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.projects.TMP_FOLDER
+import org.jraf.k2o.shapes.ExtrudedRoundedSquare
 import org.jraf.k2o.stdlib.Color
 import org.jraf.k2o.stdlib.Comment
-import org.jraf.k2o.stdlib.Cube
 import org.jraf.k2o.stdlib.color
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.translate
+import org.jraf.k2o.stdlib.union
 import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.cm
 import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
-private fun GenericBox() {
-  val lengthX = 4.cm
-  val lengthY = 5.cm
-  val lengthZ = 6.cm
-
-
-  val wallThickness = 2.mm
-  val jointSize = wallThickness * 1.5
-
-  Comment("Bottom part", false)
-  BottomPart(
+fun GenericBox(
+  lengthX: Length,
+  lengthY: Length,
+  lengthZ: Length,
+  wallThickness: Length,
+  radius: Length,
+  jointLength: Length = wallThickness * 1.5,
+) {
+  GenericBox(
     lengthX = lengthX,
     lengthY = lengthY,
-    lengthZ = lengthZ,
+    lengthZBottom = lengthZ / 2,
+    lengthZTop = lengthZ / 2,
     wallThickness = wallThickness,
-    jointSize = jointSize,
+    radius = radius,
+    jointLength = jointLength,
   )
+}
 
-  Comment("Top part")
-  translate(x = lengthX + 1.cm) {
-    TopPart(
+@Composable
+fun GenericBox(
+  lengthX: Length,
+  lengthY: Length,
+  lengthZBottom: Length,
+  lengthZTop: Length,
+  wallThickness: Length,
+  radius: Length,
+  jointLength: Length = wallThickness * 1.5,
+) {
+  union {
+    Comment("Bottom part", false)
+    BottomPart(
       lengthX = lengthX,
       lengthY = lengthY,
-      lengthZ = lengthZ,
+      lengthZ = lengthZBottom,
       wallThickness = wallThickness,
-      jointSize = jointSize,
+      jointLength = jointLength,
+      radius = radius,
     )
+
+    Comment("Top part")
+    translate(x = lengthX + 1.cm) {
+      TopPart(
+        lengthX = lengthX,
+        lengthY = lengthY,
+        lengthZ = lengthZTop,
+        wallThickness = wallThickness,
+        jointLength = jointLength,
+        radius = radius,
+      )
+    }
   }
 }
 
@@ -80,23 +105,27 @@ private fun BottomPart(
   lengthY: Length,
   lengthZ: Length,
   wallThickness: Length,
-  jointSize: Length,
+  jointLength: Length,
+  radius: Length,
 ) {
   difference {
-    Cube(
+    ExtrudedRoundedSquare(
       x = lengthX,
       y = lengthY,
-      z = lengthZ / 2,
+      z = lengthZ,
+      radius = radius,
     )
     translate(
       x = wallThickness,
       y = wallThickness,
       z = wallThickness,
     ) {
-      Cube(
-        x = lengthX - wallThickness * 2,
-        y = lengthY - wallThickness * 2,
-        z = lengthZ / 2,
+      ExtrudedRoundedSquare(
+        x = lengthX,
+        y = lengthY,
+        z = lengthZ,
+        radius = radius,
+        offset = -wallThickness,
       )
     }
 
@@ -105,12 +134,14 @@ private fun BottomPart(
       translate(
         x = wallThickness / 2,
         y = wallThickness / 2,
-        z = lengthZ / 2 - jointSize,
+        z = lengthZ - jointLength,
       ) {
-        Cube(
-          x = lengthX - wallThickness,
-          y = lengthY - wallThickness,
-          z = jointSize,
+        ExtrudedRoundedSquare(
+          x = lengthX,
+          y = lengthY,
+          z = jointLength,
+          radius = radius,
+          offset = -wallThickness / 2,
         )
       }
     }
@@ -123,23 +154,27 @@ private fun TopPart(
   lengthY: Length,
   lengthZ: Length,
   wallThickness: Length,
-  jointSize: Length,
+  jointLength: Length,
+  radius: Length,
 ) {
   difference {
-    Cube(
+    ExtrudedRoundedSquare(
       x = lengthX,
       y = lengthY,
-      z = lengthZ / 2,
+      z = lengthZ,
+      radius = radius,
     )
     translate(
       x = wallThickness,
       y = wallThickness,
       z = wallThickness,
     ) {
-      Cube(
-        x = lengthX - wallThickness * 2,
-        y = lengthY - wallThickness * 2,
-        z = lengthZ / 2,
+      ExtrudedRoundedSquare(
+        x = lengthX,
+        y = lengthY,
+        z = lengthZ,
+        radius = radius,
+        offset = -wallThickness,
       )
     }
   }
@@ -150,35 +185,50 @@ private fun TopPart(
       translate(
         x = wallThickness / 2,
         y = wallThickness / 2,
-        z = lengthZ / 2,
+        z = lengthZ,
       ) {
-        Cube(
-          x = lengthX - wallThickness,
-          y = lengthY - wallThickness,
-          z = jointSize,
+        ExtrudedRoundedSquare(
+          x = lengthX,
+          y = lengthY,
+          z = jointLength,
+          radius = radius,
+          offset = -wallThickness / 2,
         )
       }
 
       translate(
         x = wallThickness,
         y = wallThickness,
-        z = lengthZ / 2,
+        z = lengthZ,
       ) {
-        Cube(
-          x = lengthX - wallThickness * 2,
-          y = lengthY - wallThickness * 2,
-          z = jointSize,
+        ExtrudedRoundedSquare(
+          x = lengthX,
+          y = lengthY,
+          z = jointLength,
+          radius = radius,
+          offset = -wallThickness,
         )
       }
     }
   }
 }
 
-
 fun main() {
   openScad(
-    SystemFileSystem.sink(Path(TMP_FOLDER, "box.scad")).buffered(),
+    SystemFileSystem.sink(Path(TMP_FOLDER, "generic-box.scad")).buffered(),
+    fa = .1,
+    fs = .1,
   ) {
-    GenericBox()
+    val wallThickness = 2.mm
+    val totalLengthZ = 7.5.cm + wallThickness
+    val topLengthZ = 2.cm
+    GenericBox(
+      lengthX = 15.cm + wallThickness,
+      lengthY = 7.cm + wallThickness,
+      lengthZBottom = totalLengthZ - topLengthZ,
+      lengthZTop = topLengthZ,
+      wallThickness = wallThickness,
+      radius = 5.mm,
+    )
   }
 }
