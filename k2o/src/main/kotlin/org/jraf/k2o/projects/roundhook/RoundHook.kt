@@ -35,10 +35,11 @@ import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.projects.TMP_FOLDER
 import org.jraf.k2o.shapes.LzLogo
 import org.jraf.k2o.shapes.RoundedExtrudedRoundedSquare
-import org.jraf.k2o.shapes.RoundedHalfCylinder
+import org.jraf.k2o.shapes.RoundedHollowCylinder
 import org.jraf.k2o.stdlib.difference
 import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
+import org.jraf.k2o.units.Angle
 import org.jraf.k2o.units.Angle.Companion.deg
 import org.jraf.k2o.units.Length.Companion.mm
 
@@ -84,10 +85,11 @@ private fun RoundHook() {
   ) {
     rotate(x = -90.deg) {
       rotate(y = 90.deg) {
-        RoundedHalfCylinder(
+        RoundedHollowCylinder(
           height = lengthX,
           radius = hookRadius,
           thickness = thickness,
+          cut = 180.deg,
         )
       }
     }
@@ -117,29 +119,13 @@ private fun RoundHook() {
   ) {
     rotate(x = 90.deg) {
       rotate(y = 90.deg) {
-        RoundedHalfCylinder(
+        RoundedHollowCylinder(
           height = lengthX,
           radius = hookRadius,
           thickness = thickness,
+          cut = Angle.FullCircle - 90.deg - 35.deg,
         )
       }
-    }
-  }
-
-  // Top hook continuation
-  translate(
-    y = hookRadius * 2 - thickness,
-    z = middlePartZLength + thickness / 2,
-  ) {
-    rotate(x = -90.deg) {
-      RoundedExtrudedRoundedSquare(
-        x = lengthX,
-        y = middlePartZLength / 3 + thickness,
-        z = thickness,
-        topLeftRadius = (middlePartZLength / 3 + thickness) / 2,
-        topRightRadius = (middlePartZLength / 3 + thickness) / 2,
-        roundingRadius = thickness / 2,
-      )
     }
   }
 }

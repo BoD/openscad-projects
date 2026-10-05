@@ -30,21 +30,30 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
+import org.jraf.k2o.math.cos
+import org.jraf.k2o.math.sin
 import org.jraf.k2o.projects.TMP_FOLDER
-import org.jraf.k2o.stdlib.Cube
+import org.jraf.k2o.stdlib.Circle
 import org.jraf.k2o.stdlib.Cylinder
+import org.jraf.k2o.stdlib.Polygon
 import org.jraf.k2o.stdlib.Sphere
 import org.jraf.k2o.stdlib.difference
+import org.jraf.k2o.stdlib.intersection
+import org.jraf.k2o.stdlib.linearExtrude
 import org.jraf.k2o.stdlib.minkowski
+import org.jraf.k2o.stdlib.rotate
 import org.jraf.k2o.stdlib.translate
+import org.jraf.k2o.units.Angle
+import org.jraf.k2o.units.Angle.Companion.deg
 import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
-fun RoundedHalfCylinder(
+fun RoundedHollowCylinder(
   height: Length,
   radius: Length,
   thickness: Length,
+  cut: Angle,
 ) {
   translate(
     z = thickness / 2,
@@ -53,9 +62,9 @@ fun RoundedHalfCylinder(
       difference {
         Cylinder(height = height - thickness, radius = radius - thickness / 2)
         Cylinder(height = height - thickness, radius = radius - thickness / 2 - Length.Smallest)
-        // Cut half
-        translate(x = -radius, y = -radius) {
-          Cube(x = radius * 2, y = radius, z = height)
+        // Cut
+        rotate(z = 180.deg) {
+          PieSlice(radius = radius, angle = Angle.FullCircle - cut, height = height)
         }
       }
       Sphere(thickness / 2)
@@ -63,16 +72,34 @@ fun RoundedHalfCylinder(
   }
 }
 
+@Composable
+private fun PieSlice(radius: Length, angle: Angle, height: Length) {
+  linearExtrude(height = height) {
+    intersection {
+      Circle(radius = radius)
+      val resolution = (angle / 5.deg).toInt()
+      val points = Array(resolution + 1) { i ->
+        val a = angle / resolution * i
+        radius * 2 * cos(a) to radius * 2 * sin(a)
+      }
+      Polygon(
+        *arrayOf(Length.Zero to Length.Zero) + points,
+      )
+    }
+  }
+}
+
 fun main() {
   openScad(
-    SystemFileSystem.sink(Path(TMP_FOLDER, "rounded-half-cylinder.scad")).buffered(),
+    SystemFileSystem.sink(Path(TMP_FOLDER, "rounded-hollow-cylinder.scad")).buffered(),
     fa = 1.0,
     fs = 1.0,
   ) {
-    RoundedHalfCylinder(
+    RoundedHollowCylinder(
       height = 100.mm,
       radius = 50.mm,
       thickness = 5.mm,
+      cut = 90.deg,
     )
   }
 }

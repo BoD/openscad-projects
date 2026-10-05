@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-  jvmToolchain(17)
+  jvmToolchain(25)
 
   compilerOptions {
     // See https://kotlinlang.org/docs/whatsnew-eap.html#support-for-collection-literals
