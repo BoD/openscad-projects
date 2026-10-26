@@ -33,7 +33,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.jraf.k2o.dsl.openScad
 import org.jraf.k2o.projects.TMP_FOLDER
-import org.jraf.k2o.shapes.BoDLogo
+import org.jraf.k2o.shapes.CarmLogo
 import org.jraf.k2o.stdlib.Cube
 import org.jraf.k2o.stdlib.Import
 import org.jraf.k2o.stdlib.difference
@@ -46,27 +46,13 @@ import org.jraf.k2o.units.Length
 import org.jraf.k2o.units.Length.Companion.mm
 
 @Composable
-private fun KeyCoverShape(
-  width: Length,
-  height: Length,
-  thickness: Length,
-) {
-  translate(-width / 2, -height / 2) {
-    linearExtrude(height = thickness) {
-      resize(width, height, auto = true) {
-        Import("/Users/bod/gitrepo/openscad-projects/k2o/src/main/resources/key.svg", center = false)
-      }
-    }
-  }
-}
-
-@Composable
 private fun MainPart(
   keyHeadWidth: Length,
   keyHeadHeight: Length,
   keyThickness: Length,
   wallWidth: Length,
   cutOutWidth: Length,
+  logo: @Composable (width: Length, thickness: Length) -> Unit,
 ) {
   val width = keyHeadWidth + wallWidth * 2
   val height = keyHeadHeight + wallWidth * 2
@@ -116,20 +102,39 @@ private fun MainPart(
     // Bottom logo
     translate(x = -1.mm, z = wallWidth / 2) {
       rotate(z = 90.deg, x = 180.deg) {
-        BoDLogo(
-          width = 20.mm,
-          thickness = wallWidth,
-        )
+        translate(y = -1.2.mm) {
+          logo(
+            width / 2.3,
+            wallWidth,
+          )
+        }
       }
     }
 
     // Top logo
     translate(x = -1.mm, z = thickness - wallWidth / 2) {
       rotate(z = -90.deg) {
-        BoDLogo(
-          width = 20.mm,
-          thickness = wallWidth,
-        )
+        translate(y = -1.2.mm) {
+          logo(
+            width / 2.3,
+            wallWidth,
+          )
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun KeyCoverShape(
+  width: Length,
+  height: Length,
+  thickness: Length,
+) {
+  translate(-width / 2, -height / 2) {
+    linearExtrude(height = thickness) {
+      resize(width, height, auto = true) {
+        Import("/Users/bod/gitrepo/openscad-projects/k2o/src/main/resources/key.svg", center = false)
       }
     }
   }
@@ -151,25 +156,21 @@ private fun KeyCover() {
     keyThickness = keyThickness,
     wallWidth = wallWidth,
     cutOutWidth = cutOutWidth,
+    logo = { width, thickness ->
+      CarmLogo(
+        width = width,
+        thickness = thickness,
+      )
+    },
   )
-
-  // Support
-  val supportHeight = 14.mm
-  val supportWidth = 18.mm
-  translate(
-    x = -30.mm,
-    y = -supportHeight / 2,
-  ) {
-    Cube(
-      x = supportWidth,
-      y = supportHeight,
-      z = wallWidth,
-    )
-  }
 }
 
 fun main() {
-  openScad(SystemFileSystem.sink(Path(TMP_FOLDER, "key-cover.scad")).buffered()) {
+  openScad(
+    fa = 0.1,
+    fs = 0.1,
+    sink = SystemFileSystem.sink(Path(TMP_FOLDER, "key-cover.scad")).buffered(),
+  ) {
     KeyCover()
   }
 }
