@@ -42,10 +42,12 @@ import org.jraf.k2o.units.Length.Companion.mm
 @Composable
 private fun LegrandSwitchFrame() {
   val switchLengthX = 8.5.cm
-  val switchLengthY = switchLengthX
+//  val switchLengthY = switchLengthX
+//  val switchLengthY = 156.mm
+  val switchLengthY = 227.mm
   val switchLengthZ = 7.mm
   val coverTopLength = 5.mm
-  val coverThickness = 1.2.mm
+  val coverThickness = 1.6.mm
 
   val coverOutsideLengthX = switchLengthX + coverThickness * 2
   val coverOutsideLengthY = switchLengthY + coverThickness * 2
